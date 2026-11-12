@@ -1,10 +1,9 @@
 :root {
   --bg-top: #0c0908;
   --bg-bottom: #16100d;
-  --text: #b9b0a3;
-  --text-dim: #7f766a;
-  --heading: #f2ebdf;
-  --line: rgba(242, 235, 223, 0.09);
+  --text: #cfc7ba;
+  --dim: #857c70;
+  --strong: #f4eee3;
   --font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
 }
 
@@ -16,7 +15,7 @@ html, body {
   margin: 0;
   background: var(--bg-top);
   color: var(--text);
-  font: 15px/1.6 var(--font);
+  font: 16px/1.55 var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -53,36 +52,33 @@ html, body {
 
 .tip {
   position: absolute;
-  padding: 4px 9px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--heading);
+  padding: 3px 8px;
+  font-size: 13px;
+  color: var(--strong);
   background: #1b1512;
-  border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.12s;
 }
 .tip.on { opacity: 1; }
 
 /* --------------------------------------------------------- content */
 .nav {
   position: fixed;
-  top: 24px;
+  top: 22px;
   right: clamp(24px, 6vw, 110px);
   z-index: 2;
   display: flex;
-  gap: 20px;
-  font-size: 13px;
+  gap: 18px;
+  font-size: 14px;
 }
-.nav a { color: var(--text-dim); text-decoration: none; }
-.nav a:hover, .nav a:focus-visible { color: var(--heading); }
+.nav a { color: var(--dim); text-decoration: none; }
+.nav a:hover, .nav a:focus-visible { color: var(--strong); text-decoration: underline; }
 
 .content {
   position: relative;
   z-index: 1;
-  width: min(440px, 40vw);
+  width: min(460px, 40vw);
   margin: 0 clamp(24px, 6vw, 110px) 0 auto;
   padding-bottom: 45vh;
   pointer-events: none;          /* let drags reach the tree between entries */
@@ -90,54 +86,31 @@ html, body {
 .content > section > * { pointer-events: auto; }
 
 section {
-  min-height: 92vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 10vh 0;
+  gap: 14px;
+  padding: 22vh 0;
 }
-.hero { min-height: 100vh; }
+.hero { min-height: 100vh; justify-content: center; padding: 0; }
 
-h1, h2, h3 { margin: 0; color: var(--heading); font-weight: 600; }
-h1 { font-size: 40px; line-height: 1.1; letter-spacing: -0.025em; }
-h2 { font-size: 15px; line-height: 1.6; padding-bottom: 6px; }
-h3 { font-size: 15px; line-height: 1.6; font-weight: 500; }
-p { margin: 0; }
+h1, h2, h3 { margin: 0; color: var(--strong); font-size: 1em; font-weight: 600; }
+h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; }
+p, ul { margin: 0; }
 
-.key, .org { color: var(--text-dim); font-weight: 400; }
+.key, .org, .meta, .hint { color: var(--dim); font-weight: 400; }
+.hint { font-size: 14px; }
 
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-h2 + .panel { padding-top: 8px; }
-.hero .panel { gap: 14px; }
-
-/* an entry: title and date on one line, a line of detail, a hairline above */
 .card {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 14px 0;
-  border-top: 1px solid var(--line);
   cursor: pointer;
   outline: none;
 }
-/* a thin bar in the ornament's colour marks the entry being pointed at */
-.card::before {
-  content: "";
-  position: absolute;
-  left: -16px;
-  top: 14px;
-  bottom: 14px;
-  width: 2px;
-  background: var(--accent, var(--heading));
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-.card:hover::before, .card:focus-visible::before, .card.is-lit::before { opacity: 1; }
+.card + .card { margin-top: 10px; }
+/* clicking an ornament briefly marks the entry it belongs to */
+.card h3 { transition: color 0.3s; }
+.card.is-lit h3, .card:focus-visible h3 { color: var(--accent, var(--strong)); }
 
 .row {
   display: flex;
@@ -145,51 +118,58 @@ h2 + .panel { padding-top: 8px; }
   justify-content: space-between;
   gap: 16px;
 }
-.meta {
+.meta { flex: none; font-variant-numeric: tabular-nums; }
+
+/* experience: each job gets room of its own */
+.jobs { gap: 0; }
+.jobs h2 { margin-bottom: 14px; }
+.job {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 26px 0;
+}
+.job + .job { margin-top: 30px; }
+.logo {
   flex: none;
-  font-size: 13px;
-  color: var(--text-dim);
-  font-variant-numeric: tabular-nums;
+  width: 48px;
+  height: 48px;
+  margin-top: 2px;
+  border-radius: 8px;
+  object-fit: cover;
 }
+.job-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.job h3 { font-size: 18px; }
+.job ul { margin-top: 8px; padding-left: 18px; }
+.job li + li { margin-top: 4px; }
 
-.lede { font-size: 17px; line-height: 1.5; }
-.hint { font-size: 13px; color: var(--text-dim); }
-
-.links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.card .links { margin-top: 6px; }
-.links a {
-  color: var(--heading);
-  text-decoration: underline;
-  text-decoration-color: var(--text-dim);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-.links a:hover, .links a:focus-visible { text-decoration-color: var(--heading); }
+.links { display: flex; flex-wrap: wrap; gap: 2px 16px; }
+.links a { color: var(--strong); text-underline-offset: 3px; }
+.links a:hover, .links a:focus-visible { color: var(--text); }
 
 /* ----------------------------------------------------------- phone */
 @media (max-width: 899px) {
-  .nav { top: 14px; left: 20px; right: 20px; justify-content: space-between; gap: 6px; font-size: 12px; }
+  .nav { top: 0; left: 0; right: 0; padding: 12px 16px; justify-content: space-between; gap: 4px; font-size: 12px; background: rgba(13, 10, 9, 0.92); }
   .content { width: auto; margin: 0; padding: 0 0 30vh; }
-  section { justify-content: flex-end; min-height: 100vh; padding: 58vh 0 0; }
-  .hero { padding-top: 0; }
-  /* the tree is behind the text here, so each section sits on a soft scrim */
+  section { gap: 0; padding: 62vh 0 0; }
+  .hero { justify-content: flex-end; }
+  /* the tree is behind the text here, so each block sits on a dark backing */
   section > * {
-    padding-left: 24px;
-    padding-right: 24px;
-    background: rgba(13, 10, 9, 0.9);
+    padding: 7px 22px;
+    background: rgba(13, 10, 9, 0.92);
   }
   section > :first-child {
-    padding-top: 28px;
-    background: linear-gradient(rgba(13, 10, 9, 0), rgba(13, 10, 9, 0.9) 28px);
+    padding-top: 30px;
+    background: linear-gradient(rgba(13, 10, 9, 0), rgba(13, 10, 9, 0.92) 30px);
   }
-  section > :last-child { padding-bottom: 28px; }
-  h2 { padding-bottom: 10px; }
-  .card { padding-left: 24px; padding-right: 24px; border-top: 0; box-shadow: inset 0 1px var(--line); }
-  .card::before { left: 12px; }
-  h1 { font-size: 34px; }
+  section > :last-child { padding-bottom: 30px; }
+  .card + .card { margin-top: 0; padding-top: 12px; }
+  .jobs h2 { margin-bottom: 0; }
+  .job, .job + .job { margin-top: 0; padding: 20px 22px; }
+  .logo { width: 40px; height: 40px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .card::before { transition: none; }
+  .card h3 { transition: none; }
 }

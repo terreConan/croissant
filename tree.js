@@ -42,33 +42,34 @@
     ['.', ':', 'i', 'r', 's', 'n', 'e', 'a', 'h', 'd', 'w'],
     [':', '=', '+', 'x', '%', '#', '@'],
     ['o', 'o', '0', '*'],
-    ['+', '*', '*'],
+    ['o', '0', '@'],
   ];
   // vintage bulb colours
   const BULBS = [[1, 0.27, 0.2], [1, 0.68, 0.2], [0.35, 0.9, 0.42], [0.32, 0.55, 1], [1, 0.45, 0.72], [1, 0.94, 0.8]];
-  const DRIFT = 0.6;                   // seconds a letter takes to settle into place
+  const FLASH = 0.38;                  // seconds a new letter stays lit white
   const GROW = 1.1;                    // seconds an ornament or the star takes to swell in
   // how far each kind is pulled toward the camera in the depth test
   const BIAS = [0, 0, 0.02, 0.07, 0.1];
 
   const Y0 = 0.45, Y1 = 2.45;          // needle span (world units, y up)
   const GROUND_R = 1.7;
-  const STAR_Y = Y1 + 0.17;
+  const STAR_Y = Y1 + 0.09;
 
-  // timeline (seconds). Up to T_GARLAND plays on load; the rest follows scroll.
+  // timeline (seconds). The bare tree (up to T_GARLAND) plays on load. The lights
+  // follow the About section, and after that every linked entry on the page owns
+  // a slot, in page order: its object appears as the entry scrolls into view.
   const T_TRUNK = 0.3, T_TREE = 0.6, TREE_DUR = 3.3;
-  const T_GARLAND = 4.9, GARLAND_DUR = 1.4;
-  const T_BLUE = 6.95, T_RED = 8.05, T_GOLD = 9.15, ORN_SPAN = 0.4;
-  const T_GIFTS = 10.25, GIFT_SPAN = 1.0;
-  const T_STAR = 12.3, T_DONE = 13.4;
-  const SECTIONS = [
-    ['about', T_GARLAND, 6.9],
-    ['education', 6.9, 8.0],
-    ['experience', 8.0, 9.1],
-    ['honors', 9.1, 10.2],
-    ['projects', 10.2, 12.1],
-    ['contact', 12.1, T_DONE],
-  ].map(([id, a, b]) => ({ el: document.getElementById(id), a, b })).filter((s) => s.el);
+  const T_GARLAND = 4.9, GARLAND_DUR = 1.4, T_LIGHTS_END = 6.9;
+  const aboutEl = document.getElementById('about');
+  const slots = new Map();
+  let T_DONE = T_LIGHTS_END;
+  for (const el of document.querySelectorAll('[data-tree]')) {
+    const len = el.dataset.tree === 'star' ? 1.9 : 1.3;   // long enough to finish appearing
+    slots.set(el, { a: T_DONE, b: T_DONE + len });
+    T_DONE += len;
+  }
+  const birthOf = (el) => slots.get(el).a + 0.05;
+  let T_STAR = T_DONE;       // set in build(); with no star entry it simply comes last
 
   const env = (h) => {
     const tier = 1 - ((h * 6) % 1);
@@ -135,7 +136,7 @@
         const y = yb + 0.1 * L * s - 0.3 * L * s * s + gauss() * 0.025;
         const x = rad * ca - side * sa, z = rad * sa + side * ca;
         const nrm = unit(ca * 0.75 + gauss() * 0.3, 0.55 + gauss() * 0.3, sa * 0.75 + gauss() * 0.3);
-        const birth = T_TREE + TREE_DUR * (0.86 * h + 0.14 * (a / TAU)) + gauss() * 0.04;
+        const birth = T_TREE + TREE_DUR * h + gauss() * 0.05;
         if (s > 0.5 && rnd() < 0.035 * s) {
           add(x, y, z, 0, 1, 0, 0.96, 0.93, 0.88, birth, NEEDLE);  // frost on the tips
           continue;
@@ -181,11 +182,10 @@
 
     // --- ornaments: one per linked card, the colours interleaved up the tree
     const sets = [
-      ['ornament-blue', [0.3, 0.52, 0.95], T_BLUE],
-      ['ornament-red', [0.86, 0.1, 0.12], T_RED],
-      ['ornament-gold', [0.95, 0.68, 0.18], T_GOLD],
-    ].map(([type, col, t0]) => linked(type).map((el, j, all) =>
-      ({ el, type, col, birth: t0 + ((j + 0.5) / all.length) * ORN_SPAN })));
+      ['ornament-blue', [0.3, 0.52, 0.95]],
+      ['ornament-red', [0.86, 0.1, 0.12]],
+      ['ornament-gold', [0.95, 0.68, 0.18]],
+    ].map(([type, col]) => linked(type).map((el) => ({ el, type, col, birth: birthOf(el) })));
     const orns = [];
     for (let i = 0; i < Math.max(...sets.map((set) => set.length)); i++) {
       for (const set of sets) if (set[i]) orns.push(set[i]);
@@ -203,17 +203,13 @@
       curObj = 0;
     });
 
-    // --- star: a flat five-pointed star that always faces the viewer
+    // --- star: a glowing ball at the tip
     const starEl = linked('star')[0];
+    if (starEl) T_STAR = birthOf(starEl); else T_DONE += 1.9;
     if (starEl) link(starEl, 'star', [1.0, 0.82, 0.3], [0, STAR_Y, 0], null, T_STAR);
-    const RO = 0.2, RI = 0.08, BETA = TAU / 10;
-    for (let i = 0; i < 2600; i++) {
-      const th = rnd() * TAU;
-      const fold = (((th - Math.PI / 2) % (2 * BETA)) + 2 * BETA) % (2 * BETA);
-      const phi = fold > BETA ? 2 * BETA - fold : fold;
-      const edge = (RO * RI * Math.sin(BETA)) / (RI * Math.sin(BETA - phi) + RO * Math.sin(phi));
-      const r = Math.sqrt(rnd()) * edge, core = 1 - 0.3 * (r / RO);
-      add(r * Math.cos(th), STAR_Y + r * Math.sin(th), 0, 0, 0, -1, 1.0 * core, 0.84 * core, 0.36 * core, T_STAR, STAR);
+    for (const d of fib(420)) {
+      const r = 0.075;
+      add(d[0] * r, STAR_Y + d[1] * r, d[2] * r, d[0], d[1], d[2], 1.0, 0.82, 0.3, T_STAR, STAR);
     }
     curObj = 0;
 
@@ -233,7 +229,7 @@
       const dist = 1.02 + uni(-0.04, 0.06);
       const px = dist * Math.cos(a), pz = dist * Math.sin(a);
       const rot = a + uni(-0.5, 0.5), cr = Math.cos(rot), sr = Math.sin(rot);
-      const t0 = T_GIFTS + (gi / presents.length) * GIFT_SPAN;
+      const t0 = birthOf(el);
       link(el, 'present', gf.c, [px, gf.h / 2, pz], a, t0);
       const put = (lx, ly, lz, nx, ny, nz, col) => {
         add(px + lx * cr - lz * sr, ly, pz + lx * sr + lz * cr,
@@ -360,7 +356,7 @@
   // ------------------------------------------------------------- state
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const BASE_SPIN = reduced ? 0.08 : 0.33;
-  // ?t=13 holds the timeline at least that far along (handy when tuning)
+  // ?t=99 holds the timeline at least that far along (handy when tuning)
   const floorT = parseFloat(new URLSearchParams(location.search).get('t')) || 0;
   const AUTO_END = T_GARLAND - 0.05;
   let t = floorT;            // timeline position
@@ -376,12 +372,16 @@
   function readScroll() {
     const vh = window.innerHeight;
     let s = 0;
-    for (const sec of SECTIONS) {
-      const p = clamp((vh * 0.9 - sec.el.getBoundingClientRect().top) / (vh * 0.55), 0, 1);
-      if (p > 0) s = Math.max(s, sec.a + p * (sec.b - sec.a));
+    if (aboutEl) {
+      const p = clamp((vh * 0.9 - aboutEl.getBoundingClientRect().top) / (vh * 0.55), 0, 1);
+      if (p > 0) s = T_GARLAND + p * (T_LIGHTS_END - T_GARLAND);
+    }
+    for (const [el, slot] of slots) {
+      const p = clamp((vh * 0.85 - el.getBoundingClientRect().top) / (vh * 0.2), 0, 1);
+      if (p > 0) s = Math.max(s, slot.a + p * (slot.b - slot.a));
     }
     const doc = document.documentElement;
-    if (SECTIONS.length && vh + window.scrollY >= doc.scrollHeight - 2) s = T_DONE;
+    if (vh + window.scrollY >= doc.scrollHeight - 2) s = T_DONE;
     scrollT = s;
   }
 
@@ -393,7 +393,7 @@
     autoT = Math.min(AUTO_END, autoT + dt);
     const target = Math.max(autoT, scrollT, floorT);
     if (reduced) t = target;
-    else if (target > t) t += Math.min(target - t, dt * (1 + Math.min(1.5, (target - t) * 0.4)));  // real time, a little faster when far behind
+    else if (target > t) t += Math.min(target - t, dt * (1 + Math.min(5, (target - t) * 0.5)));  // real time, faster the further behind
     else t += (target - t) * Math.min(1, dt * 8);                // un-build quickly
 
     if (!dragging) {
@@ -431,17 +431,8 @@
           wy = obj.pos[1] + (wy - obj.pos[1]) * sc;
           wz = obj.pos[2] + (wz - obj.pos[2]) * sc;
         }
-      } else if (age < DRIFT && kind !== OCC) {
-        // letters swirl in from above and outside, then settle
-        const k = 1 - age / DRIFT, e = k * k * k, seed = P[o + 11];
-        const cs = Math.cos(e * 1.8), sn = Math.sin(e * 1.8), grow = 1 + e * 0.9;
-        const rx = wx * cs - wz * sn, rz = wx * sn + wz * cs;
-        wx = rx * grow + e * 0.35 * Math.cos(seed * 50);
-        wz = rz * grow + e * 0.35 * Math.sin(seed * 50);
-        wy += e * (0.2 + 0.7 * seed);
       }
-      const still = kind === STAR;          // the star doesn't spin with the tree
-      const x = still ? wx : wx * ca + wz * sa, z = still ? wz : -wx * sa + wz * ca;
+      const x = wx * ca + wz * sa, z = -wx * sa + wz * ca;
       const qy = wy - CAM_Y, qz = z + CAM_D;
       const zc = -qy * SP + qz * CP;
       if (zc < 0.2) continue;
@@ -506,8 +497,8 @@
         const d = Math.max(0, nx * LIGHT_DIR[0] + P[o + 4] * LIGHT_DIR[1] + nz * LIGHT_DIR[2]);
         const age = t - P[o + 9];
         const soft = P[o + 12] > 0 && objects[P[o + 12] - 1].soft;
-        const flash = soft ? 0 : Math.max(0, 1 - age / DRIFT);
-        const fade = soft ? Math.min(1, age / GROW) : 1;      // soft objects fade up, no ember
+        const flash = soft ? 0 : Math.max(0, 1 - age / FLASH);
+        const fade = soft ? Math.min(1, age / GROW) : 1;      // soft objects fade up, no flash
         let lum, spec = 0, level;
 
         if (kind === NEEDLE) {
@@ -529,11 +520,11 @@
           level += 0.2;
         }
         lum *= fade; spec *= fade;
-        level = Math.min(0.999, level + flash * 0.5);
-        const f = flash * flash * 0.85;      // letters arrive as warm embers, then take their colour
+        level = Math.min(0.999, level + flash);
+        const f = flash * 0.9;               // new letters flash white, then take their colour
         const R = Math.min(255, ((P[o + 6] * lum + spec) * (1 - f) + f) * 255) | 0;
-        const G = Math.min(255, ((P[o + 7] * lum + spec) * (1 - f) + f * 0.74) * 255) | 0;
-        const B = Math.min(255, ((P[o + 8] * lum + spec) * (1 - f) + f * 0.42) * 255) | 0;
+        const G = Math.min(255, ((P[o + 7] * lum + spec) * (1 - f) + f) * 255) | 0;
+        const B = Math.min(255, ((P[o + 8] * lum + spec) * (1 - f) + f) * 255) | 0;
         const ramp = RAMPS[kind];
         ctx.fillStyle = css(R, G, B);
         ctx.fillText(ramp[(level * ramp.length) | 0], px, py);
@@ -558,11 +549,26 @@
       }
     }
     if (t > T_STAR) {
-      const k = Math.pow(Math.min(1, (t - T_STAR) / 1.6), 2) * (hl && hl.type === 'star' ? 1.3 : 1);
+      const k = Math.pow(Math.min(1, (t - T_STAR) / 1.6), 2) * (hl && hl.type === 'star' ? 1.25 : 1);
       const [sx, sy] = project(0, STAR_Y, 0);
-      const size = cellH * 17 * k * (0.9 + 0.1 * Math.sin(clock * 2.4));
-      ctx.globalAlpha = Math.min(1, 0.85 * k);
-      ctx.drawImage(warmGlow, sx - size / 2, sy - size / 2, size, size);
+      const pulse = 0.85 + 0.15 * Math.sin(clock * 2.4);
+      const big = cellH * 22 * k * pulse;
+      ctx.globalAlpha = Math.min(1, 0.9 * k);
+      ctx.drawImage(warmGlow, sx - big / 2, sy - big / 2, big, big);
+      ctx.lineWidth = 1;
+      const unitLen = cellH * k * pulse;
+      const rays = [[-90, 10], [-64, 7], [-116, 7], [0, 8], [180, 8], [90, 5], [58, 4], [122, 4], [-32, 3.5], [-148, 3.5]];
+      for (const [deg, len] of rays) {
+        const a = (deg * Math.PI) / 180, dx = Math.cos(a), dy = Math.sin(a);
+        const g = ctx.createLinearGradient(sx, sy, sx + dx * len * unitLen, sy + dy * len * unitLen);
+        g.addColorStop(0, 'rgba(255,214,120,0.9)');
+        g.addColorStop(1, 'rgba(255,214,120,0)');
+        ctx.strokeStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(sx + dx * unitLen, sy + dy * unitLen);
+        ctx.lineTo(sx + dx * len * unitLen, sy + dy * len * unitLen);
+        ctx.stroke();
+      }
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
