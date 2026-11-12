@@ -1,18 +1,11 @@
 :root {
-  --bg-top: #03050b;
-  --bg-bottom: #070b18;
-  --text: #c9d1e4;
-  --text-dim: #7c879f;
-  --heading: #eef2fb;
-  --panel: rgba(6, 9, 18, 0.8);
-  --line: rgba(255, 255, 255, 0.08);
-  --hud: #6f7a94;
-  --hud-accent: #d9737a;
-  --red: #e0484e;
-  --gold: #f0b94a;
-  --green: #58b877;
-  --mono: "SF Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
-  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --bg-top: #0c0908;
+  --bg-bottom: #16100d;
+  --text: #b9b0a3;
+  --text-dim: #7f766a;
+  --heading: #f2ebdf;
+  --line: rgba(242, 235, 223, 0.09);
+  --font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -23,7 +16,8 @@ html, body {
   margin: 0;
   background: var(--bg-top);
   color: var(--text);
-  font: 15px/1.6 var(--sans);
+  font: 15px/1.6 var(--font);
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ------------------------------------------------------------ tree */
@@ -57,24 +51,13 @@ html, body {
   mix-blend-mode: screen;
 }
 
-.hud {
-  position: absolute;
-  font: 11px/1.6 var(--mono);
-  color: var(--hud);
-  white-space: pre;
-  pointer-events: none;
-  user-select: none;
-}
-.hud-time { top: 14px; left: 18px; color: var(--hud-accent); }
-.hud-stats { left: 18px; bottom: 14px; }
-
 .tip {
   position: absolute;
   padding: 4px 9px;
-  font: 11px/1.5 var(--mono);
+  font-size: 12px;
+  line-height: 1.4;
   color: var(--heading);
-  background: rgba(6, 9, 18, 0.92);
-  border: 1px solid var(--accent, var(--line));
+  background: #1b1512;
   border-radius: 4px;
   white-space: nowrap;
   pointer-events: none;
@@ -86,23 +69,23 @@ html, body {
 /* --------------------------------------------------------- content */
 .nav {
   position: fixed;
-  top: 12px;
-  right: 18px;
+  top: 24px;
+  right: clamp(24px, 6vw, 110px);
   z-index: 2;
   display: flex;
-  gap: 16px;
-  font: 11px/1.6 var(--mono);
+  gap: 20px;
+  font-size: 13px;
 }
-.nav a { color: var(--hud); text-decoration: none; }
+.nav a { color: var(--text-dim); text-decoration: none; }
 .nav a:hover, .nav a:focus-visible { color: var(--heading); }
 
 .content {
   position: relative;
   z-index: 1;
-  width: min(500px, 40vw);
+  width: min(440px, 40vw);
   margin: 0 clamp(24px, 6vw, 110px) 0 auto;
   padding-bottom: 45vh;
-  pointer-events: none;          /* let drags reach the tree between cards */
+  pointer-events: none;          /* let drags reach the tree between entries */
 }
 .content > section > * { pointer-events: auto; }
 
@@ -111,82 +94,102 @@ section {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 12px;
-  padding: 8vh 0;
-  scroll-margin-top: 0;
+  padding: 10vh 0;
 }
 .hero { min-height: 100vh; }
 
-section > header {
+h1, h2, h3 { margin: 0; color: var(--heading); font-weight: 600; }
+h1 { font-size: 40px; line-height: 1.1; letter-spacing: -0.025em; }
+h2 { font-size: 15px; line-height: 1.6; padding-bottom: 6px; }
+h3 { font-size: 15px; line-height: 1.6; font-weight: 500; }
+p { margin: 0; }
+
+.key, .org { color: var(--text-dim); font-weight: 400; }
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+h2 + .panel { padding-top: 8px; }
+.hero .panel { gap: 14px; }
+
+/* an entry: title and date on one line, a line of detail, a hairline above */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  outline: none;
+}
+/* a thin bar in the ornament's colour marks the entry being pointed at */
+.card::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 14px;
+  bottom: 14px;
+  width: 2px;
+  background: var(--accent, var(--heading));
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.card:hover::before, .card:focus-visible::before, .card.is-lit::before { opacity: 1; }
+
+.row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 2px;
+  gap: 16px;
+}
+.meta {
+  flex: none;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
 
-h1, h2, h3 { color: var(--heading); margin: 0; font-family: var(--mono); }
-h1 { font-size: clamp(30px, 4vw, 44px); letter-spacing: -0.02em; line-height: 1.15; }
-h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
-h3 { font-size: 15px; font-weight: 600; }
-p { margin: 0; }
+.lede { font-size: 17px; line-height: 1.5; }
+.hint { font-size: 13px; color: var(--text-dim); }
 
-.key { font: 11px/1.6 var(--mono); color: var(--text-dim); }
-.key::before { content: "● "; }
-.key-red::before { color: var(--red); }
-.key-gold::before { color: var(--gold); }
-.key-light::before { color: #ffd98a; }
-.key-present::before { content: "■ "; color: #4a78e0; }
-
-.panel, .card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+.links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.card .links { margin-top: 6px; }
+.links a {
+  color: var(--heading);
+  text-decoration: underline;
+  text-decoration-color: var(--text-dim);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
-.hero .panel { padding: 22px 24px; gap: 12px; }
-
-.card {
-  border-left: 3px solid var(--accent, var(--line));
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  outline: none;
-}
-.card:hover, .card:focus-visible, .card.is-lit {
-  border-color: var(--accent, var(--text-dim));
-  box-shadow: 0 0 0 1px var(--accent, transparent), 0 0 28px -8px var(--accent, transparent);
-  transform: translateX(-3px);
-}
-
-.lede { font-size: 17px; color: var(--text); }
-.org { color: var(--text-dim); font-weight: 400; }
-.meta { font: 12px/1.5 var(--mono); color: var(--text-dim); }
-.hint { font: 11px/1.6 var(--mono); color: var(--text-dim); }
-
-.links { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 13px/1.6 var(--mono); }
-.links a { color: var(--green); text-decoration: none; border-bottom: 1px dashed currentColor; }
-.links a:hover, .links a:focus-visible { color: var(--heading); }
+.links a:hover, .links a:focus-visible { text-decoration-color: var(--heading); }
 
 /* ----------------------------------------------------------- phone */
 @media (max-width: 899px) {
-  .content {
-    width: auto;
-    margin: 0;
-    padding: 0 16px 40vh;
-  }
-  section { justify-content: flex-end; min-height: 100vh; padding: 56vh 0 6vh; }
+  .nav { top: 14px; left: 20px; right: 20px; justify-content: space-between; gap: 6px; font-size: 12px; }
+  .content { width: auto; margin: 0; padding: 0 0 30vh; }
+  section { justify-content: flex-end; min-height: 100vh; padding: 58vh 0 0; }
   .hero { padding-top: 0; }
-  .panel, .card { background: rgba(6, 9, 18, 0.9); }
-  .nav { left: 16px; right: 16px; justify-content: space-between; gap: 8px; }
-  .hud { display: none; }
+  /* the tree is behind the text here, so each section sits on a soft scrim */
+  section > * {
+    padding-left: 24px;
+    padding-right: 24px;
+    background: rgba(13, 10, 9, 0.9);
+  }
+  section > :first-child {
+    padding-top: 28px;
+    background: linear-gradient(rgba(13, 10, 9, 0), rgba(13, 10, 9, 0.9) 28px);
+  }
+  section > :last-child { padding-bottom: 28px; }
+  h2 { padding-bottom: 10px; }
+  .card { padding-left: 24px; padding-right: 24px; border-top: 0; box-shadow: inset 0 1px var(--line); }
+  .card::before { left: 12px; }
+  h1 { font-size: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .card { transition: none; }
+  .card::before { transition: none; }
 }

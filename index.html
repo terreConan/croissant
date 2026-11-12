@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Andrew Shin</title>
   <meta name="description" content="Andrew Shin's personal site.">
-  <meta name="theme-color" content="#04060d">
+  <meta name="theme-color" content="#0d0a09">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!--
     The tree is built from this page. Any element with a data-tree attribute
     gets an object on the tree, and clicking that object scrolls to the element:
+      data-tree="ornament-blue"  one blue ornament  (education)
       data-tree="ornament-red"   one red ornament   (experience)
       data-tree="ornament-gold"  one gold ornament  (honors)
       data-tree="present"        one present        (projects)
@@ -21,17 +22,16 @@
   <div class="stage" aria-hidden="true">
     <canvas id="scene"></canvas>
     <canvas id="glow"></canvas>
-    <div class="hud hud-time" id="hud-time"></div>
-    <div class="hud hud-stats" id="hud-stats"></div>
     <div class="tip" id="tip"></div>
   </div>
 
   <nav class="nav" aria-label="Sections">
-    <a href="#about">about</a>
-    <a href="#experience">experience</a>
-    <a href="#honors">honors</a>
-    <a href="#projects">projects</a>
-    <a href="#contact">contact</a>
+    <a href="#about">About</a>
+    <a href="#education">Education</a>
+    <a href="#experience">Experience</a>
+    <a href="#honors">Honors</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
   </nav>
 
   <main class="content">
@@ -45,84 +45,82 @@
           <a href="#">Résumé</a>
           <a href="#contact">Contact</a>
         </p>
-        <p class="hint">scroll to decorate the tree ↓ &nbsp;·&nbsp; drag to spin &nbsp;·&nbsp; click an ornament</p>
+        <p class="hint">Scroll to decorate the tree. Drag to spin it, or click an ornament.</p>
       </div>
     </section>
 
     <section id="about">
-      <header><h2>About</h2><span class="key key-light">the lights</span></header>
+      <h2>About <span class="key">(the lights)</span></h2>
       <div class="panel">
         <p>[A short paragraph about you: what you study or work on, what you're curious about, and the kind of problems you like.]</p>
-        <p>[A second paragraph if you want one: school, graduation year, interests outside of work.]</p>
+        <p>[A second paragraph if you want one: interests outside of work, what you're doing now.]</p>
       </div>
     </section>
 
+    <section id="education">
+      <h2>Education <span class="key">(blue ornaments)</span></h2>
+      <article class="card" data-tree="ornament-blue" tabindex="0">
+        <div class="row"><h3>[School] <span class="org">· [Degree or programme]</span></h3><span class="meta">[Start] – [End]</span></div>
+        <p>[Coursework, focus area or anything worth a line.]</p>
+      </article>
+    </section>
+
     <section id="experience">
-      <header><h2>Experience</h2><span class="key key-red">red ornaments</span></header>
+      <h2>Experience <span class="key">(red ornaments)</span></h2>
       <article class="card" data-tree="ornament-red" tabindex="0">
-        <h3>[Role title] <span class="org">· [Organization]</span></h3>
-        <p class="meta">[Start] – [End] · [Location]</p>
+        <div class="row"><h3>[Role title] <span class="org">· [Organization]</span></h3><span class="meta">[Start] – [End]</span></div>
         <p>[One or two lines on what you did and what came of it.]</p>
       </article>
       <article class="card" data-tree="ornament-red" tabindex="0">
-        <h3>[Role title] <span class="org">· [Organization]</span></h3>
-        <p class="meta">[Start] – [End] · [Location]</p>
+        <div class="row"><h3>[Role title] <span class="org">· [Organization]</span></h3><span class="meta">[Start] – [End]</span></div>
         <p>[One or two lines on what you did and what came of it.]</p>
       </article>
       <article class="card" data-tree="ornament-red" tabindex="0">
-        <h3>[Role title] <span class="org">· [Organization]</span></h3>
-        <p class="meta">[Start] – [End] · [Location]</p>
+        <div class="row"><h3>[Role title] <span class="org">· [Organization]</span></h3><span class="meta">[Start] – [End]</span></div>
         <p>[One or two lines on what you did and what came of it.]</p>
       </article>
       <article class="card" data-tree="ornament-red" tabindex="0">
-        <h3>[Role title] <span class="org">· [Organization]</span></h3>
-        <p class="meta">[Start] – [End] · [Location]</p>
+        <div class="row"><h3>[Role title] <span class="org">· [Organization]</span></h3><span class="meta">[Start] – [End]</span></div>
         <p>[One or two lines on what you did and what came of it.]</p>
       </article>
     </section>
 
     <section id="honors">
-      <header><h2>Honors</h2><span class="key key-gold">gold ornaments</span></header>
+      <h2>Honors <span class="key">(gold ornaments)</span></h2>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <h3>[Honor or award]</h3>
-        <p class="meta">[Year] · [Awarding body]</p>
+        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
         <p>[One line on what it recognises.]</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <h3>[Honor or award]</h3>
-        <p class="meta">[Year] · [Awarding body]</p>
+        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
         <p>[One line on what it recognises.]</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <h3>[Honor or award]</h3>
-        <p class="meta">[Year] · [Awarding body]</p>
+        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
         <p>[One line on what it recognises.]</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <h3>[Honor or award]</h3>
-        <p class="meta">[Year] · [Awarding body]</p>
+        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
         <p>[One line on what it recognises.]</p>
       </article>
     </section>
 
     <section id="projects">
-      <header><h2>Projects</h2><span class="key key-present">presents</span></header>
+      <h2>Projects <span class="key">(presents)</span></h2>
       <article class="card" data-tree="present" tabindex="0">
-        <h3>[Project name]</h3>
-        <p class="meta">[Stack or tools] · [Year]</p>
+        <div class="row"><h3>[Project name] <span class="org">· [Stack or tools]</span></h3><span class="meta">[Year]</span></div>
         <p>[What it does and why you built it.]</p>
         <p class="links"><a href="#">Code</a><a href="#">Demo</a></p>
       </article>
       <article class="card" data-tree="present" tabindex="0">
-        <h3>[Project name]</h3>
-        <p class="meta">[Stack or tools] · [Year]</p>
+        <div class="row"><h3>[Project name] <span class="org">· [Stack or tools]</span></h3><span class="meta">[Year]</span></div>
         <p>[What it does and why you built it.]</p>
         <p class="links"><a href="#">Code</a><a href="#">Demo</a></p>
       </article>
     </section>
 
     <section id="contact">
-      <header><h2>Contact</h2><span class="key key-gold">the star</span></header>
+      <h2>Contact <span class="key">(the star)</span></h2>
       <article class="card" data-tree="star" data-label="Contact" tabindex="0">
         <p>[A line on what you're open to: internships, collaborations, a chat.]</p>
         <p class="links">

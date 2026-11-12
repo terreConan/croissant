@@ -18,8 +18,6 @@
   const ctx = canvas.getContext('2d');
   const glowCanvas = document.getElementById('glow');
   const glowCtx = glowCanvas.getContext('2d');
-  const hudTime = document.getElementById('hud-time');
-  const hudStats = document.getElementById('hud-stats');
   const tip = document.getElementById('tip');
 
   // ---------------------------------------------------------------- rng
@@ -40,36 +38,41 @@
   const OCC = 0, NEEDLE = 1, SOLID = 2, LIGHT = 3, STAR = 4;
   const RAMPS = [
     [' '],
-    ['.', ':', ';', '\\', '*', 'x', 's', 'o', '%', '%', '#'],
+    // needles are written with the letters of "andrew shin", light to dense
+    ['.', ':', 'i', 'r', 's', 'n', 'e', 'a', 'h', 'd', 'w'],
     [':', '=', '+', 'x', '%', '#', '@'],
     ['o', 'o', '0', '*'],
-    ['o', '0', '@'],
+    ['+', '*', '*'],
   ];
-  const GROUND_RAMP = ['.', ':', ':', '-', '-', '=', '=', '+', '#'];
+  // vintage bulb colours
+  const BULBS = [[1, 0.27, 0.2], [1, 0.68, 0.2], [0.35, 0.9, 0.42], [0.32, 0.55, 1], [1, 0.45, 0.72], [1, 0.94, 0.8]];
+  const DRIFT = 0.6;                   // seconds a letter takes to settle into place
+  const GROW = 1.1;                    // seconds an ornament or the star takes to swell in
   // how far each kind is pulled toward the camera in the depth test
   const BIAS = [0, 0, 0.02, 0.07, 0.1];
 
   const Y0 = 0.45, Y1 = 2.45;          // needle span (world units, y up)
-  const GROUND_R = 1.95;
-  const STAR_Y = Y1 + 0.09;
+  const GROUND_R = 1.7;
+  const STAR_Y = Y1 + 0.17;
 
   // timeline (seconds). Up to T_GARLAND plays on load; the rest follows scroll.
-  const T_TRUNK = 0.3, T_TREE = 0.6, TREE_DUR = 4.2;
-  const T_GARLAND = 4.9, GARLAND_DUR = 2.2;
-  const T_RED = 7.2, T_GOLD = 8.4, ORN_SPAN = 1.0;
-  const T_GIFTS = 9.6, GIFT_SPAN = 1.3;
-  const T_STAR = 11.9, T_DONE = 13;
+  const T_TRUNK = 0.3, T_TREE = 0.6, TREE_DUR = 3.3;
+  const T_GARLAND = 4.9, GARLAND_DUR = 1.4;
+  const T_BLUE = 6.95, T_RED = 8.05, T_GOLD = 9.15, ORN_SPAN = 0.4;
+  const T_GIFTS = 10.25, GIFT_SPAN = 1.0;
+  const T_STAR = 12.3, T_DONE = 13.4;
   const SECTIONS = [
-    ['about', T_GARLAND, 7.15],
-    ['experience', 7.15, 8.35],
-    ['honors', 8.35, 9.55],
-    ['projects', 9.55, 11.6],
-    ['contact', 11.6, T_DONE],
+    ['about', T_GARLAND, 6.9],
+    ['education', 6.9, 8.0],
+    ['experience', 8.0, 9.1],
+    ['honors', 9.1, 10.2],
+    ['projects', 10.2, 12.1],
+    ['contact', 12.1, T_DONE],
   ].map(([id, a, b]) => ({ el: document.getElementById(id), a, b })).filter((s) => s.el);
 
   const env = (h) => {
-    const tier = 1 - ((h * 9) % 1);
-    return 0.88 * Math.pow(1 - h, 0.74) * (0.86 + 0.14 * tier) + 0.02;
+    const tier = 1 - ((h * 6) % 1);
+    return 0.9 * Math.pow(1 - h, 0.8) * (0.72 + 0.28 * tier) + 0.02;
   };
 
   // x y z | nx ny nz | r g b | birth kind seed object
@@ -97,13 +100,13 @@
 
   // objects linked to page elements; a point's object field is index + 1
   const objects = [];
-  const TYPE_NAME = { 'ornament-red': 'experience', 'ornament-gold': 'honor', present: 'project', star: 'contact' };
+  const TYPE_NAME = { 'ornament-blue': 'education', 'ornament-red': 'experience', 'ornament-gold': 'honor', present: 'project', star: 'contact' };
   const link = (el, type, color, pos, azimuth, birth) => {
     const heading = el.querySelector('h3, h2');
     const label = el.dataset.label || (heading ? heading.textContent.replace(/\s+/g, ' ').trim() : '');
     const accent = `rgb(${color.map((c) => Math.round(Math.min(1, c * 1.1) * 255)).join(',')})`;
     el.style.setProperty('--accent', accent);
-    objects.push({ el, type, label, accent, pos, azimuth, birth });
+    objects.push({ el, type, label, accent, pos, azimuth, birth, soft: type !== 'present' });
     curObj = objects.length;
   };
   const linked = (type) => [...document.querySelectorAll(`[data-tree="${type}"]`)];
@@ -132,16 +135,16 @@
         const y = yb + 0.1 * L * s - 0.3 * L * s * s + gauss() * 0.025;
         const x = rad * ca - side * sa, z = rad * sa + side * ca;
         const nrm = unit(ca * 0.75 + gauss() * 0.3, 0.55 + gauss() * 0.3, sa * 0.75 + gauss() * 0.3);
-        const birth = T_TREE + TREE_DUR * h + gauss() * 0.05;
-        if (s > 0.45 && rnd() < 0.05 * s) {
-          add(x, y, z, 0, 1, 0, 0.92, 0.95, 1.0, birth, NEEDLE);   // snow on the tips
+        const birth = T_TREE + TREE_DUR * (0.86 * h + 0.14 * (a / TAU)) + gauss() * 0.04;
+        if (s > 0.5 && rnd() < 0.035 * s) {
+          add(x, y, z, 0, 1, 0, 0.96, 0.93, 0.88, birth, NEEDLE);  // frost on the tips
           continue;
         }
         const ao = 0.35 + 0.65 * Math.pow(s, 1.3);
         const tone = ao * uni(0.75, 1.1);
         const tip = Math.pow(rnd(), 3) * 0.6;
         add(x, y, z, nrm[0], nrm[1], nrm[2],
-          (0.1 + 0.25 * tip) * tone, (0.44 + 0.34 * tip) * tone, (0.2 + 0.1 * tip) * tone,
+          (0.09 + 0.3 * tip) * tone, (0.46 + 0.3 * tip) * tone, (0.31 + 0.12 * tip) * tone,
           birth, NEEDLE);
       }
     }
@@ -153,45 +156,39 @@
         0, 0, 0, T_TREE + TREE_DUR * h, OCC);
     }
 
-    // --- garland: a swagged spiral of wire with warm bulbs
-    const TURNS = 3.6;
-    const spiral = (u) => {
-      const h = 0.05 + 0.8 * u;
-      const ag = TAU * TURNS * u + 0.9;
-      const swag = -0.06 * Math.abs(Math.sin(ag * 2.5));
-      const L = env(h);
-      return [0.93 * L * Math.cos(ag), Y0 + h * (Y1 - Y0) - 0.17 * L + swag, 0.93 * L * Math.sin(ag), ag];
-    };
-    for (let i = 0; i < 2600; i++) {
-      const u = i / 2600, p = spiral(u);
-      add(p[0] + gauss() * 0.006, p[1] + gauss() * 0.006, p[2] + gauss() * 0.006,
-        Math.cos(p[3]), 0.3, Math.sin(p[3]), 0.62, 0.44, 0.14, T_GARLAND + GARLAND_DUR * u, SOLID);
-    }
+    // --- lights: two strands of coloured bulbs wound opposite ways
     lightTimes = [];
-    for (let i = 0; i < 150; i++) {
-      const u = (i + 0.5) / 150, p = spiral(u), w = rnd() < 0.12;
-      const birth = T_GARLAND + GARLAND_DUR * u;
+    const bulb = (x, y, z, birth, pal) => {
       lightTimes.push(birth);
-      add(p[0] * 1.03, p[1], p[2] * 1.03, 0, 1, 0, 1.0, w ? 0.95 : 0.78, w ? 0.85 : 0.32, birth, LIGHT);
+      const c = BULBS[pal];
+      add(x, y, z, pal, 1, 0, c[0], c[1], c[2], birth, LIGHT);   // nx carries the palette index
+    };
+    for (let strand = 0; strand < 2; strand++) {
+      const dir = strand ? -1 : 1;
+      for (let i = 0; i < 75; i++) {
+        const u = (i + 0.5) / 75, h = 0.05 + 0.82 * u, L = env(h);
+        const ag = dir * TAU * 2.7 * u + strand * 2.1;
+        const sag = -0.05 * Math.abs(Math.sin(ag * 2.5));
+        bulb(0.96 * L * Math.cos(ag), Y0 + h * (Y1 - Y0) - 0.17 * L + sag, 0.96 * L * Math.sin(ag),
+          T_GARLAND + GARLAND_DUR * (0.5 * strand + 0.5 * u), (i + strand * 3) % BULBS.length);
+      }
     }
-    for (let i = 0; i < 20; i++) {             // a few loose fairy lights
+    for (let i = 0; i < 20; i++) {             // a few loose ones
       const h = uni(0.05, 0.9), a = rnd() * TAU, L = env(h) * 0.9;
-      const birth = T_GARLAND + rnd() * GARLAND_DUR;
-      lightTimes.push(birth);
-      add(L * Math.cos(a), Y0 + h * (Y1 - Y0) - 0.15 * L, L * Math.sin(a), 0, 1, 0, 1.0, 0.85, 0.5, birth, LIGHT);
+      bulb(L * Math.cos(a), Y0 + h * (Y1 - Y0) - 0.15 * L, L * Math.sin(a), T_GARLAND + rnd() * GARLAND_DUR, 5);
     }
     lightTimes.sort((a, b) => a - b);
 
-    // --- ornaments: one per linked card, red and gold interleaved up the tree
-    const RED = [0.86, 0.1, 0.12], GOLD = [0.95, 0.68, 0.18];
-    const reds = linked('ornament-red').map((el, j, all) =>
-      ({ el, type: 'ornament-red', col: RED, birth: T_RED + ((j + 0.5) / all.length) * ORN_SPAN }));
-    const golds = linked('ornament-gold').map((el, j, all) =>
-      ({ el, type: 'ornament-gold', col: GOLD, birth: T_GOLD + ((j + 0.5) / all.length) * ORN_SPAN }));
+    // --- ornaments: one per linked card, the colours interleaved up the tree
+    const sets = [
+      ['ornament-blue', [0.3, 0.52, 0.95], T_BLUE],
+      ['ornament-red', [0.86, 0.1, 0.12], T_RED],
+      ['ornament-gold', [0.95, 0.68, 0.18], T_GOLD],
+    ].map(([type, col, t0]) => linked(type).map((el, j, all) =>
+      ({ el, type, col, birth: t0 + ((j + 0.5) / all.length) * ORN_SPAN })));
     const orns = [];
-    for (let i = 0; i < Math.max(reds.length, golds.length); i++) {
-      if (reds[i]) orns.push(reds[i]);
-      if (golds[i]) orns.push(golds[i]);
+    for (let i = 0; i < Math.max(...sets.map((set) => set.length)); i++) {
+      for (const set of sets) if (set[i]) orns.push(set[i]);
     }
     orns.forEach((orn, k) => {
       const h = 0.78 - 0.68 * ((k + 0.5) / orns.length), a = k * 2.39996 + 0.4;
@@ -206,12 +203,17 @@
       curObj = 0;
     });
 
-    // --- star
+    // --- star: a flat five-pointed star that always faces the viewer
     const starEl = linked('star')[0];
     if (starEl) link(starEl, 'star', [1.0, 0.82, 0.3], [0, STAR_Y, 0], null, T_STAR);
-    for (const d of fib(420)) {
-      const r = 0.075;
-      add(d[0] * r, STAR_Y + d[1] * r, d[2] * r, d[0], d[1], d[2], 1.0, 0.82, 0.3, T_STAR, STAR);
+    const RO = 0.2, RI = 0.08, BETA = TAU / 10;
+    for (let i = 0; i < 2600; i++) {
+      const th = rnd() * TAU;
+      const fold = (((th - Math.PI / 2) % (2 * BETA)) + 2 * BETA) % (2 * BETA);
+      const phi = fold > BETA ? 2 * BETA - fold : fold;
+      const edge = (RO * RI * Math.sin(BETA)) / (RI * Math.sin(BETA - phi) + RO * Math.sin(phi));
+      const r = Math.sqrt(rnd()) * edge, core = 1 - 0.3 * (r / RO);
+      add(r * Math.cos(th), STAR_Y + r * Math.sin(th), 0, 0, 0, -1, 1.0 * core, 0.84 * core, 0.36 * core, T_STAR, STAR);
     }
     curObj = 0;
 
@@ -269,7 +271,7 @@
   pts.length = 0;
 
   // -------------------------------------------------------------- snow
-  const FLAKES = 300;
+  const FLAKES = 150;
   const flakes = new Float32Array(FLAKES * 5);       // x, y, speed, size, phase
   for (let i = 0; i < FLAKES; i++) {
     const depth = rnd();
@@ -277,7 +279,7 @@
   }
 
   // ------------------------------------------------------------ camera
-  const CAM_D = 6.2, PITCH = (16 * Math.PI) / 180, TARGET_Y = 1.32;
+  const CAM_D = 6.2, PITCH = (16 * Math.PI) / 180, TARGET_Y = 1.38;
   const CP = Math.cos(PITCH), SP = Math.sin(PITCH);
   const CAM_Y = TARGET_Y + CAM_D * Math.tan(PITCH);
   const LIGHT_DIR = unit(-0.45, 0.72, -0.55);
@@ -297,7 +299,7 @@
     const wide = W >= 900;
     originX = wide ? W * 0.31 : W * 0.5;
     originY = wide ? H * 0.5 : H * 0.36;
-    focal = wide ? Math.min(1.84 * H, 3.3 * W * 0.52) : Math.min(1.3 * H, 3.3 * W);
+    focal = wide ? Math.min(1.68 * H, 3.3 * W * 0.52) : Math.min(1.2 * H, 3.3 * W);
     cellH = Math.max(5, (focal * 0.4) / 64);
     cellW = cellH * 0.6;
     cols = Math.ceil(W / cellW); rows = Math.ceil(H / cellH);
@@ -343,8 +345,9 @@
     x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
     return c;
   };
-  const warmGlow = sprite(255, 190, 90);
-  const whiteGlow = sprite(255, 255, 255);
+  const warmGlow = sprite(255, 196, 100);
+  const whiteGlow = sprite(255, 250, 240);
+  const bulbGlow = BULBS.map((c) => sprite(...c.map((v) => Math.round(v * 255))));
 
   const colorCache = new Map();
   const css = (r, g, b) => {
@@ -390,7 +393,7 @@
     autoT = Math.min(AUTO_END, autoT + dt);
     const target = Math.max(autoT, scrollT, floorT);
     if (reduced) t = target;
-    else if (target > t) t += Math.min(target - t, dt * 4);     // build at up to 4x
+    else if (target > t) t += Math.min(target - t, dt * (1 + Math.min(1.5, (target - t) * 0.4)));  // real time, a little faster when far behind
     else t += (target - t) * Math.min(1, dt * 8);                // un-build quickly
 
     if (!dragging) {
@@ -416,15 +419,36 @@
 
     // project
     for (let i = 0, o = 0; i < N; i++, o += STRIDE) {
-      if (P[o + 9] > t) continue;
-      const x = P[o] * ca + P[o + 2] * sa, z = -P[o] * sa + P[o + 2] * ca;
-      const qy = P[o + 1] - CAM_Y, qz = z + CAM_D;
+      const age = t - P[o + 9];
+      if (age < 0) continue;
+      const kind = P[o + 10];
+      let wx = P[o], wy = P[o + 1], wz = P[o + 2];
+      const obj = P[o + 12] > 0 ? objects[P[o + 12] - 1] : null;
+      if (obj && obj.soft) {
+        if (age < GROW) {
+          const k = 1 - age / GROW, sc = 1 - k * k * k;
+          wx = obj.pos[0] + (wx - obj.pos[0]) * sc;
+          wy = obj.pos[1] + (wy - obj.pos[1]) * sc;
+          wz = obj.pos[2] + (wz - obj.pos[2]) * sc;
+        }
+      } else if (age < DRIFT && kind !== OCC) {
+        // letters swirl in from above and outside, then settle
+        const k = 1 - age / DRIFT, e = k * k * k, seed = P[o + 11];
+        const cs = Math.cos(e * 1.8), sn = Math.sin(e * 1.8), grow = 1 + e * 0.9;
+        const rx = wx * cs - wz * sn, rz = wx * sn + wz * cs;
+        wx = rx * grow + e * 0.35 * Math.cos(seed * 50);
+        wz = rz * grow + e * 0.35 * Math.sin(seed * 50);
+        wy += e * (0.2 + 0.7 * seed);
+      }
+      const still = kind === STAR;          // the star doesn't spin with the tree
+      const x = still ? wx : wx * ca + wz * sa, z = still ? wz : -wx * sa + wz * ca;
+      const qy = wy - CAM_Y, qz = z + CAM_D;
       const zc = -qy * SP + qz * CP;
       if (zc < 0.2) continue;
       const c = Math.floor(ccx + (x * fx) / zc);
       const r = Math.floor(ccy - ((qy * CP + qz * SP) * fy) / zc);
       if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
-      const cell = r * cols + c, zz = zc - BIAS[P[o + 10]];
+      const cell = r * cols + c, zz = zc - BIAS[kind];
       if (zz < zbuf[cell]) { zbuf[cell] = zz; ibuf[cell] = i; }
     }
 
@@ -441,7 +465,7 @@
       if (depth < 0.85 && ibuf[cell] >= 0) continue;
       const tw = 0.55 + 0.45 * Math.sin(clock * (0.6 + depth) + flakes[o + 4] * 3);
       const s = 0.8 + 1.5 * depth * depth;
-      ctx.fillStyle = `rgba(225,232,255,${(0.2 + 0.75 * depth) * tw})`;
+      ctx.fillStyle = `rgba(244,236,222,${(0.15 + 0.6 * depth) * tw})`;
       ctx.fillRect(px, py, s, s);
     }
 
@@ -456,7 +480,6 @@
     const hl = hoverObj || focusObj;
     const hlId = hl ? objects.indexOf(hl) + 1 : -1;
     const hlPulse = 0.5 + 0.5 * Math.sin(clock * 6);
-    let letters = 0;
     visLights.length = 0;
 
     for (let r = 0, cell = 0; r < rows; r++) {
@@ -465,19 +488,15 @@
         const i = ibuf[cell];
         const px = (c + 0.5) * cellW;
         if (i < 0) {
-          // snow-covered ground disc
+          // a soft drift of snow, stippled, thinning toward the edge
           const gr = groundR[cell];
           if (gr < 0 || gr > reveal) continue;
           const hh = groundHash[cell];
-          const edge = Math.min(1, (GROUND_R - gr) * 2.2);
-          let b = (0.3 + 0.7 * Math.exp(-Math.pow(gr / 1.1, 2))) * (0.4 + 0.6 * edge);
-          b *= r % 2 ? 1 : 0.72;
-          const front = Math.max(0, 1 - Math.abs(gr - reveal) * 5) * (t < 1.4 ? 1 : 0);
-          b = Math.min(1, b + front * 0.5);
-          const k = Math.min(GROUND_RAMP.length - 1, Math.max(0, Math.floor((b + (hh - 0.5) * 0.22) * GROUND_RAMP.length)));
-          ctx.fillStyle = css((b * (200 + 40 * warm)) | 0, (b * 212) | 0, (b * (238 - 30 * warm)) | 0);
-          ctx.fillText(GROUND_RAMP[k], px, py);
-          letters++;
+          const dens = 0.62 * Math.exp(-Math.pow(gr / 0.85, 2)) + 0.05 * (1 - gr / GROUND_R);
+          if (hh > dens) continue;
+          const b = 0.4 + 0.6 * (1 - gr / GROUND_R);
+          ctx.fillStyle = css((b * (228 + 20 * warm)) | 0, (b * 222) | 0, (b * (214 - 24 * warm)) | 0);
+          ctx.fillText(hh < dens * 0.08 ? '*' : hh < dens * 0.5 ? ':' : '.', px, py);
           continue;
         }
         const o = i * STRIDE, kind = P[o + 10];
@@ -486,12 +505,14 @@
         const nx = P[o + 3] * ca + P[o + 5] * sa, nz = -P[o + 3] * sa + P[o + 5] * ca;
         const d = Math.max(0, nx * LIGHT_DIR[0] + P[o + 4] * LIGHT_DIR[1] + nz * LIGHT_DIR[2]);
         const age = t - P[o + 9];
-        const flash = Math.max(0, 1 - age / 0.38);
+        const soft = P[o + 12] > 0 && objects[P[o + 12] - 1].soft;
+        const flash = soft ? 0 : Math.max(0, 1 - age / DRIFT);
+        const fade = soft ? Math.min(1, age / GROW) : 1;      // soft objects fade up, no ember
         let lum, spec = 0, level;
 
         if (kind === NEEDLE) {
-          lum = 0.4 + 0.9 * d;
-          level = d * 0.65 + seed * 0.5;
+          lum = 0.8 + 1.05 * d;
+          level = d * 0.6 + seed * 0.55;
         } else if (kind === SOLID) {
           lum = 0.32 + 0.85 * d;
           spec = Math.pow(d, 24) * 0.7;
@@ -500,31 +521,31 @@
           const tw = kind === STAR ? 0.9 + 0.1 * Math.sin(clock * 3 + seed * 9)
             : 0.62 + 0.38 * Math.sin(clock * (2 + 3 * seed) + seed * 40);
           lum = tw; level = seed;
-          if (kind === LIGHT) visLights.push(px, py, tw);
+          if (kind === LIGHT) visLights.push(px, py, tw, P[o + 3]);
         }
         if (P[o + 12] === hlId) {            // linked object under attention
           lum = lum * 1.3 + 0.15;
           spec += 0.1 + 0.14 * hlPulse;
           level += 0.2;
         }
-        level = Math.min(0.999, level + flash);
-        const f = flash * 0.9;
+        lum *= fade; spec *= fade;
+        level = Math.min(0.999, level + flash * 0.5);
+        const f = flash * flash * 0.85;      // letters arrive as warm embers, then take their colour
         const R = Math.min(255, ((P[o + 6] * lum + spec) * (1 - f) + f) * 255) | 0;
-        const G = Math.min(255, ((P[o + 7] * lum + spec) * (1 - f) + f) * 255) | 0;
-        const B = Math.min(255, ((P[o + 8] * lum + spec) * (1 - f) + f) * 255) | 0;
+        const G = Math.min(255, ((P[o + 7] * lum + spec) * (1 - f) + f * 0.74) * 255) | 0;
+        const B = Math.min(255, ((P[o + 8] * lum + spec) * (1 - f) + f * 0.42) * 255) | 0;
         const ramp = RAMPS[kind];
         ctx.fillStyle = css(R, G, B);
         ctx.fillText(ramp[(level * ramp.length) | 0], px, py);
-        letters++;
       }
     }
 
     // additive glows: bulbs, the highlighted object, then the star and its rays
     ctx.globalCompositeOperation = 'lighter';
     const gs = cellH * 5.5;
-    for (let i = 0; i < visLights.length; i += 3) {
-      ctx.globalAlpha = visLights[i + 2] * 0.75;
-      ctx.drawImage(warmGlow, visLights[i] - gs / 2, visLights[i + 1] - gs / 2, gs, gs);
+    for (let i = 0; i < visLights.length; i += 4) {
+      ctx.globalAlpha = visLights[i + 2] * 0.8;
+      ctx.drawImage(bulbGlow[visLights[i + 3]], visLights[i] - gs / 2, visLights[i + 1] - gs / 2, gs, gs);
     }
     if (hl && hl.type !== 'star' && hl.birth <= t) {
       const [x, y, z] = hl.pos;
@@ -537,38 +558,17 @@
       }
     }
     if (t > T_STAR) {
-      const k = Math.min(1, (t - T_STAR) / 0.9) * (hl && hl.type === 'star' ? 1.25 : 1);
+      const k = Math.pow(Math.min(1, (t - T_STAR) / 1.6), 2) * (hl && hl.type === 'star' ? 1.3 : 1);
       const [sx, sy] = project(0, STAR_Y, 0);
-      const pulse = 0.85 + 0.15 * Math.sin(clock * 2.4);
-      const big = cellH * 22 * k * pulse;
-      ctx.globalAlpha = Math.min(1, 0.9 * k);
-      ctx.drawImage(warmGlow, sx - big / 2, sy - big / 2, big, big);
-      ctx.lineWidth = 1;
-      const unitLen = cellH * k * pulse;
-      const rays = [[-90, 10], [-64, 7], [-116, 7], [0, 8], [180, 8], [90, 5], [58, 4], [122, 4], [-32, 3.5], [-148, 3.5]];
-      for (const [deg, len] of rays) {
-        const a = (deg * Math.PI) / 180, dx = Math.cos(a), dy = Math.sin(a);
-        const g = ctx.createLinearGradient(sx, sy, sx + dx * len * unitLen, sy + dy * len * unitLen);
-        g.addColorStop(0, 'rgba(255,214,120,0.9)');
-        g.addColorStop(1, 'rgba(255,214,120,0)');
-        ctx.strokeStyle = g;
-        ctx.beginPath();
-        ctx.moveTo(sx + dx * unitLen, sy + dy * unitLen);
-        ctx.lineTo(sx + dx * len * unitLen, sy + dy * len * unitLen);
-        ctx.stroke();
-      }
+      const size = cellH * 17 * k * (0.9 + 0.1 * Math.sin(clock * 2.4));
+      ctx.globalAlpha = Math.min(1, 0.85 * k);
+      ctx.drawImage(warmGlow, sx - size / 2, sy - size / 2, size, size);
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
 
     glowCtx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
     glowCtx.drawImage(canvas, 0, 0, glowCanvas.width, glowCanvas.height);
-
-    const deg = (((angle * 180) / Math.PI) % 360 + 360) % 360;
-    hudTime.textContent = `t ${t.toFixed(2).padStart(5, '0')}s`;
-    hudStats.textContent =
-      `rotation ${deg.toFixed(2).padStart(6, '0')}°    lights ${String(lit).padStart(3, ' ')}\n` +
-      `letters ${letters.toLocaleString('en-US')}`;
   }
 
   // ------------------------------------------------------- interaction
