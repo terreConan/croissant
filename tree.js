@@ -2,8 +2,13 @@
  *
  * A 3D point cloud (needles, garland, ornaments, star, presents) is rotated,
  * projected onto a grid of character cells with a z-buffer, and each winning
- * point is drawn as one coloured glyph. Points carry a birth time, so the
- * scene assembles itself bottom-up before settling into a slow spin.
+ * point is drawn as one coloured glyph. Points carry a birth time on a shared
+ * timeline: the bare tree grows by itself on load, and scrolling through the
+ * page sections advances the timeline to add the decorations.
+ *
+ * Ornaments, presents and the star are created from the page: every element
+ * with a data-tree attribute gets one object, and the two are linked (click
+ * the object to reach the card, hover the card to find the object).
  */
 (() => {
   'use strict';
@@ -15,6 +20,7 @@
   const glowCtx = glowCanvas.getContext('2d');
   const hudTime = document.getElementById('hud-time');
   const hudStats = document.getElementById('hud-stats');
+  const tip = document.getElementById('tip');
 
   // ---------------------------------------------------------------- rng
   function mulberry32(a) {
@@ -28,6 +34,7 @@
   const rnd = mulberry32(7);
   const gauss = () => (rnd() + rnd() + rnd() + rnd() - 2) * 1.732;
   const uni = (a, b) => a + (b - a) * rnd();
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   // ------------------------------------------------------------- scene
   const OCC = 0, NEEDLE = 1, SOLID = 2, LIGHT = 3, STAR = 4;
@@ -43,22 +50,34 @@
   const BIAS = [0, 0, 0.02, 0.07, 0.1];
 
   const Y0 = 0.45, Y1 = 2.45;          // needle span (world units, y up)
-  const GROUND_R = 2.15;
+  const GROUND_R = 1.95;
   const STAR_Y = Y1 + 0.09;
 
-  // timeline (seconds)
+  // timeline (seconds). Up to T_GARLAND plays on load; the rest follows scroll.
   const T_TRUNK = 0.3, T_TREE = 0.6, TREE_DUR = 4.2;
   const T_GARLAND = 4.9, GARLAND_DUR = 2.2;
-  const T_ORN = 7.0, T_STAR = 9.3, T_GIFTS = 9.9, T_DONE = 13;
+  const T_RED = 7.2, T_GOLD = 8.4, ORN_SPAN = 1.0;
+  const T_GIFTS = 9.6, GIFT_SPAN = 1.3;
+  const T_STAR = 11.9, T_DONE = 13;
+  const SECTIONS = [
+    ['about', T_GARLAND, 7.15],
+    ['experience', 7.15, 8.35],
+    ['honors', 8.35, 9.55],
+    ['projects', 9.55, 11.6],
+    ['contact', 11.6, T_DONE],
+  ].map(([id, a, b]) => ({ el: document.getElementById(id), a, b })).filter((s) => s.el);
 
   const env = (h) => {
     const tier = 1 - ((h * 9) % 1);
     return 0.88 * Math.pow(1 - h, 0.74) * (0.86 + 0.14 * tier) + 0.02;
   };
 
+  // x y z | nx ny nz | r g b | birth kind seed object
+  const STRIDE = 13;
   const pts = [];
+  let curObj = 0;
   const add = (x, y, z, nx, ny, nz, r, g, b, birth, kind) => {
-    pts.push(x, y, z, nx, ny, nz, r, g, b, birth, kind, rnd());
+    pts.push(x, y, z, nx, ny, nz, r, g, b, birth, kind, rnd(), curObj);
   };
   const unit = (x, y, z) => {
     const l = Math.hypot(x, y, z) || 1;
@@ -75,6 +94,19 @@
     return out;
   };
   const treeH = () => (rnd() < 0.78 ? 1 - Math.sqrt(rnd()) : rnd());
+
+  // objects linked to page elements; a point's object field is index + 1
+  const objects = [];
+  const TYPE_NAME = { 'ornament-red': 'experience', 'ornament-gold': 'honor', present: 'project', star: 'contact' };
+  const link = (el, type, color, pos, azimuth, birth) => {
+    const heading = el.querySelector('h3, h2');
+    const label = el.dataset.label || (heading ? heading.textContent.replace(/\s+/g, ' ').trim() : '');
+    const accent = `rgb(${color.map((c) => Math.round(Math.min(1, c * 1.1) * 255)).join(',')})`;
+    el.style.setProperty('--accent', accent);
+    objects.push({ el, type, label, accent, pos, azimuth, birth });
+    curObj = objects.length;
+  };
+  const linked = (type) => [...document.querySelectorAll(`[data-tree="${type}"]`)];
 
   let lightTimes = [];
 
@@ -144,47 +176,63 @@
     }
     for (let i = 0; i < 20; i++) {             // a few loose fairy lights
       const h = uni(0.05, 0.9), a = rnd() * TAU, L = env(h) * 0.9;
-      const birth = T_ORN + rnd() * 2;
+      const birth = T_GARLAND + rnd() * GARLAND_DUR;
       lightTimes.push(birth);
       add(L * Math.cos(a), Y0 + h * (Y1 - Y0) - 0.15 * L, L * Math.sin(a), 0, 1, 0, 1.0, 0.85, 0.5, birth, LIGHT);
     }
     lightTimes.sort((a, b) => a - b);
 
-    // --- ornaments
-    const ORN = 17, order = [...Array(ORN).keys()].sort(() => rnd() - 0.5);
-    for (let k = 0; k < ORN; k++) {
-      const h = 0.06 + 0.8 * ((k + 0.5) / ORN), a = k * 2.39996 + 0.4;
-      const L = env(h), rad = 0.055 + 0.04 * (1 - h);
+    // --- ornaments: one per linked card, red and gold interleaved up the tree
+    const RED = [0.86, 0.1, 0.12], GOLD = [0.95, 0.68, 0.18];
+    const reds = linked('ornament-red').map((el, j, all) =>
+      ({ el, type: 'ornament-red', col: RED, birth: T_RED + ((j + 0.5) / all.length) * ORN_SPAN }));
+    const golds = linked('ornament-gold').map((el, j, all) =>
+      ({ el, type: 'ornament-gold', col: GOLD, birth: T_GOLD + ((j + 0.5) / all.length) * ORN_SPAN }));
+    const orns = [];
+    for (let i = 0; i < Math.max(reds.length, golds.length); i++) {
+      if (reds[i]) orns.push(reds[i]);
+      if (golds[i]) orns.push(golds[i]);
+    }
+    orns.forEach((orn, k) => {
+      const h = 0.78 - 0.68 * ((k + 0.5) / orns.length), a = k * 2.39996 + 0.4;
+      const L = env(h), rad = 0.072 + 0.04 * (1 - h);
       const cx = 0.97 * L * Math.cos(a), cz = 0.97 * L * Math.sin(a);
       const cy = Y0 + h * (Y1 - Y0) - 0.2 * L - rad * 0.6;
-      const gold = k % 4 === 2;
-      const col = gold ? [0.95, 0.68, 0.18] : [0.86, 0.1, 0.12];
-      const birth = T_ORN + order[k] * 0.13;
+      link(orn.el, orn.type, orn.col, [cx, cy, cz], a, orn.birth);
       for (const d of fib(Math.round(260 + 5200 * rad))) {
         add(cx + d[0] * rad, cy + d[1] * rad, cz + d[2] * rad, d[0], d[1], d[2],
-          col[0], col[1], col[2], birth, SOLID);
+          orn.col[0], orn.col[1], orn.col[2], orn.birth, SOLID);
       }
-    }
+      curObj = 0;
+    });
 
     // --- star
+    const starEl = linked('star')[0];
+    if (starEl) link(starEl, 'star', [1.0, 0.82, 0.3], [0, STAR_Y, 0], null, T_STAR);
     for (const d of fib(420)) {
       const r = 0.075;
       add(d[0] * r, STAR_Y + d[1] * r, d[2] * r, d[0], d[1], d[2], 1.0, 0.82, 0.3, T_STAR, STAR);
     }
+    curObj = 0;
 
-    // --- presents
-    const gifts = [
-      { a: 3.55, r: 0.98, w: 0.36, h: 0.27, d: 0.3, c: [0.82, 0.1, 0.1], rb: [0.95, 0.75, 0.25] },
-      { a: 5.65, r: 1.05, w: 0.32, h: 0.2, d: 0.26, c: [0.12, 0.25, 0.8], rb: [0.95, 0.78, 0.3] },
-      { a: 4.6, r: 0.92, w: 0.26, h: 0.17, d: 0.26, c: [0.9, 0.9, 0.94], rb: [0.85, 0.1, 0.12] },
-      { a: 0.9, r: 0.95, w: 0.24, h: 0.22, d: 0.24, c: [0.9, 0.66, 0.16], rb: [0.8, 0.1, 0.1] },
-      { a: 2.3, r: 1.0, w: 0.26, h: 0.32, d: 0.24, c: [0.45, 0.04, 0.1], rb: [0.92, 0.92, 0.95] },
-      { a: 1.65, r: 1.12, w: 0.2, h: 0.14, d: 0.2, c: [0.1, 0.5, 0.25], rb: [0.9, 0.2, 0.2] },
+    // --- presents: one per linked card, spaced around the base
+    const WRAP = [
+      { w: 0.38, h: 0.29, d: 0.32, c: [0.82, 0.1, 0.1], rb: [0.95, 0.75, 0.25] },
+      { w: 0.34, h: 0.22, d: 0.28, c: [0.14, 0.3, 0.85], rb: [0.95, 0.78, 0.3] },
+      { w: 0.28, h: 0.19, d: 0.28, c: [0.9, 0.9, 0.94], rb: [0.85, 0.1, 0.12] },
+      { w: 0.26, h: 0.24, d: 0.26, c: [0.9, 0.66, 0.16], rb: [0.8, 0.1, 0.1] },
+      { w: 0.28, h: 0.34, d: 0.26, c: [0.5, 0.06, 0.4], rb: [0.92, 0.92, 0.95] },
+      { w: 0.24, h: 0.17, d: 0.24, c: [0.1, 0.55, 0.3], rb: [0.9, 0.2, 0.2] },
     ];
-    gifts.forEach((gf, gi) => {
-      const px = gf.r * Math.cos(gf.a), pz = gf.r * Math.sin(gf.a);
-      const rot = gf.a + uni(-0.5, 0.5), cr = Math.cos(rot), sr = Math.sin(rot);
-      const t0 = T_GIFTS + gi * 0.4;
+    const presents = linked('present');
+    presents.forEach((el, gi) => {
+      const gf = WRAP[gi % WRAP.length];
+      const a = 3.9 + (gi * TAU) / presents.length + uni(-0.15, 0.15);
+      const dist = 1.02 + uni(-0.04, 0.06);
+      const px = dist * Math.cos(a), pz = dist * Math.sin(a);
+      const rot = a + uni(-0.5, 0.5), cr = Math.cos(rot), sr = Math.sin(rot);
+      const t0 = T_GIFTS + (gi / presents.length) * GIFT_SPAN;
+      link(el, 'present', gf.c, [px, gf.h / 2, pz], a, t0);
       const put = (lx, ly, lz, nx, ny, nz, col) => {
         add(px + lx * cr - lz * sr, ly, pz + lx * sr + lz * cr,
           nx * cr - nz * sr, ny, nx * sr + nz * cr, col[0], col[1], col[2],
@@ -211,11 +259,12 @@
           put(side * 0.035 + d[0] * 0.035, gf.h + 0.02 + d[1] * 0.022, d[2] * 0.03, d[0], d[1], d[2], gf.rb);
         }
       }
+      curObj = 0;
     });
   }
 
   build();
-  const STRIDE = 12, N = pts.length / STRIDE;
+  const N = pts.length / STRIDE;
   const P = new Float32Array(pts);
   pts.length = 0;
 
@@ -234,6 +283,7 @@
   const LIGHT_DIR = unit(-0.45, 0.72, -0.55);
 
   let W = 0, H = 0, dpr = 1, cellW = 6, cellH = 10, cols = 0, rows = 0, focal = 1;
+  let originX = 0, originY = 0;        // where the tree's look-at point lands on screen
   let zbuf, ibuf, groundR, groundHash;
 
   function resize() {
@@ -243,7 +293,11 @@
     glowCanvas.width = Math.max(1, Math.round(W / 4));
     glowCanvas.height = Math.max(1, Math.round(H / 4));
 
-    focal = Math.min(1.84 * H, 3.3 * W);
+    // wide: tree on the left, text on the right. narrow: tree up top, text over it.
+    const wide = W >= 900;
+    originX = wide ? W * 0.31 : W * 0.5;
+    originY = wide ? H * 0.5 : H * 0.36;
+    focal = wide ? Math.min(1.84 * H, 3.3 * W * 0.52) : Math.min(1.3 * H, 3.3 * W);
     cellH = Math.max(5, (focal * 0.4) / 64);
     cellW = cellH * 0.6;
     cols = Math.ceil(W / cellW); rows = Math.ceil(H / cellH);
@@ -256,8 +310,8 @@
     const h = mulberry32(99);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const u = ((c + 0.5) * cellW - W / 2) / focal;
-        const v = -((r + 0.5) * cellH - H / 2) / focal;
+        const u = ((c + 0.5) * cellW - originX) / focal;
+        const v = -((r + 0.5) * cellH - originY) / focal;
         const dy = v * CP - SP;
         let rad = -1;
         if (dy < -1e-4) {
@@ -269,6 +323,13 @@
         groundHash[r * cols + c] = h();
       }
     }
+    readScroll();
+  }
+
+  // world point (already spun) -> screen pixels
+  function project(x, y, z) {
+    const qy = y - CAM_Y, qz = z + CAM_D, zc = -qy * SP + qz * CP;
+    return [originX + (x * focal) / zc, originY - ((qy * CP + qz * SP) * focal) / zc];
   }
 
   // ------------------------------------------------------------ sprites
@@ -283,6 +344,7 @@
     return c;
   };
   const warmGlow = sprite(255, 190, 90);
+  const whiteGlow = sprite(255, 255, 255);
 
   const colorCache = new Map();
   const css = (r, g, b) => {
@@ -295,19 +357,53 @@
   // ------------------------------------------------------------- state
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const BASE_SPIN = reduced ? 0.08 : 0.33;
-  // ?t=13 jumps straight to a point on the timeline (handy when tuning)
-  const startAt = parseFloat(new URLSearchParams(location.search).get('t'));
-  let t = Number.isFinite(startAt) ? startAt : reduced ? T_DONE : 0, angle = 0, spin = BASE_SPIN, last = 0;
-  let dragging = false, dragX = 0, dragV = 0;
+  // ?t=13 holds the timeline at least that far along (handy when tuning)
+  const floorT = parseFloat(new URLSearchParams(location.search).get('t')) || 0;
+  const AUTO_END = T_GARLAND - 0.05;
+  let t = floorT;            // timeline position
+  let autoT = reduced ? AUTO_END : 0;   // the part that plays by itself
+  let scrollT = 0;           // how far the page scroll has pushed the timeline
+  let clock = 0;             // wall time, for twinkle and snow
+  let angle = 0, spin = BASE_SPIN, last = 0;
+  let dragging = false, dragX = 0, dragV = 0, downX = 0, downY = 0, moved = false;
+  let hoverObj = null;       // object under the pointer
+  let focusObj = null;       // object whose card is hovered or focused
   const visLights = [];
+
+  function readScroll() {
+    const vh = window.innerHeight;
+    let s = 0;
+    for (const sec of SECTIONS) {
+      const p = clamp((vh * 0.9 - sec.el.getBoundingClientRect().top) / (vh * 0.55), 0, 1);
+      if (p > 0) s = Math.max(s, sec.a + p * (sec.b - sec.a));
+    }
+    const doc = document.documentElement;
+    if (SECTIONS.length && vh + window.scrollY >= doc.scrollHeight - 2) s = T_DONE;
+    scrollT = s;
+  }
 
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000 || 0);
     last = now;
-    t += dt;
+    clock += dt;
+
+    autoT = Math.min(AUTO_END, autoT + dt);
+    const target = Math.max(autoT, scrollT, floorT);
+    if (reduced) t = target;
+    else if (target > t) t += Math.min(target - t, dt * 4);     // build at up to 4x
+    else t += (target - t) * Math.min(1, dt * 8);                // un-build quickly
+
     if (!dragging) {
-      angle += spin * dt;
-      spin += (BASE_SPIN - spin) * Math.min(1, dt * 1.2);
+      if (focusObj && focusObj.azimuth !== null && focusObj.birth <= t) {
+        // turn the linked object toward the camera
+        const want = focusObj.azimuth + Math.PI / 2;
+        const d = ((((want - angle) % TAU) + TAU * 1.5) % TAU) - Math.PI;
+        angle += d * Math.min(1, dt * 4);
+        spin = 0;
+      } else {
+        angle += spin * dt;
+        spin += ((hoverObj ? 0 : BASE_SPIN) - spin) * Math.min(1, dt * (hoverObj ? 8 : 1.2));
+      }
     }
     render();
     requestAnimationFrame(frame);
@@ -315,7 +411,7 @@
 
   function render() {
     const ca = Math.cos(angle), sa = Math.sin(angle);
-    const fx = focal / cellW, fy = focal / cellH, ccx = W / 2 / cellW, ccy = H / 2 / cellH;
+    const fx = focal / cellW, fy = focal / cellH, ccx = originX / cellW, ccy = originY / cellH;
     zbuf.fill(Infinity); ibuf.fill(-1);
 
     // project
@@ -338,12 +434,12 @@
     // snow behind the glyphs
     for (let i = 0, o = 0; i < FLAKES; i++, o += 5) {
       const depth = flakes[o + 3];
-      const y = (flakes[o + 1] + flakes[o + 2] * t) % 1;
-      const x = flakes[o] + 0.006 * Math.sin(t * 0.5 + flakes[o + 4]);
+      const y = (flakes[o + 1] + flakes[o + 2] * clock) % 1;
+      const x = flakes[o] + 0.006 * Math.sin(clock * 0.5 + flakes[o + 4]);
       const px = x * W, py = y * H;
       const cell = Math.floor(py / cellH) * cols + Math.floor(px / cellW);
       if (depth < 0.85 && ibuf[cell] >= 0) continue;
-      const tw = 0.55 + 0.45 * Math.sin(t * (0.6 + depth) + flakes[o + 4] * 3);
+      const tw = 0.55 + 0.45 * Math.sin(clock * (0.6 + depth) + flakes[o + 4] * 3);
       const s = 0.8 + 1.5 * depth * depth;
       ctx.fillStyle = `rgba(225,232,255,${(0.2 + 0.75 * depth) * tw})`;
       ctx.fillRect(px, py, s, s);
@@ -357,6 +453,9 @@
     let lit = 0;
     while (lit < lightTimes.length && lightTimes[lit] <= t) lit++;
     const warm = lit / lightTimes.length;
+    const hl = hoverObj || focusObj;
+    const hlId = hl ? objects.indexOf(hl) + 1 : -1;
+    const hlPulse = 0.5 + 0.5 * Math.sin(clock * 6);
     let letters = 0;
     visLights.length = 0;
 
@@ -398,10 +497,15 @@
           spec = Math.pow(d, 24) * 0.7;
           level = 0.25 + d * 0.6 + seed * 0.25;
         } else {
-          const tw = kind === STAR ? 0.9 + 0.1 * Math.sin(t * 3 + seed * 9)
-            : 0.62 + 0.38 * Math.sin(t * (2 + 3 * seed) + seed * 40);
+          const tw = kind === STAR ? 0.9 + 0.1 * Math.sin(clock * 3 + seed * 9)
+            : 0.62 + 0.38 * Math.sin(clock * (2 + 3 * seed) + seed * 40);
           lum = tw; level = seed;
           if (kind === LIGHT) visLights.push(px, py, tw);
+        }
+        if (P[o + 12] === hlId) {            // linked object under attention
+          lum = lum * 1.3 + 0.15;
+          spec += 0.1 + 0.14 * hlPulse;
+          level += 0.2;
         }
         level = Math.min(0.999, level + flash);
         const f = flash * 0.9;
@@ -415,20 +519,29 @@
       }
     }
 
-    // additive glows: bulbs, then the star and its rays
+    // additive glows: bulbs, the highlighted object, then the star and its rays
     ctx.globalCompositeOperation = 'lighter';
     const gs = cellH * 5.5;
     for (let i = 0; i < visLights.length; i += 3) {
       ctx.globalAlpha = visLights[i + 2] * 0.75;
       ctx.drawImage(warmGlow, visLights[i] - gs / 2, visLights[i + 1] - gs / 2, gs, gs);
     }
+    if (hl && hl.type !== 'star' && hl.birth <= t) {
+      const [x, y, z] = hl.pos;
+      const zr = -x * sa + z * ca;
+      if (zr < 0.25) {                       // only when it's on the near side
+        const [sx, sy] = project(x * ca + z * sa, y, zr);
+        const size = cellH * (hl.type === 'present' ? 20 : 13);
+        ctx.globalAlpha = 0.5 + 0.3 * hlPulse;
+        ctx.drawImage(whiteGlow, sx - size / 2, sy - size / 2, size, size);
+      }
+    }
     if (t > T_STAR) {
-      const k = Math.min(1, (t - T_STAR) / 0.9);
-      const qy = STAR_Y - CAM_Y, zc = -qy * SP + CAM_D * CP;
-      const sx = W / 2, sy = H / 2 - ((qy * CP + CAM_D * SP) * focal) / zc;
-      const pulse = 0.85 + 0.15 * Math.sin(t * 2.4);
+      const k = Math.min(1, (t - T_STAR) / 0.9) * (hl && hl.type === 'star' ? 1.25 : 1);
+      const [sx, sy] = project(0, STAR_Y, 0);
+      const pulse = 0.85 + 0.15 * Math.sin(clock * 2.4);
       const big = cellH * 22 * k * pulse;
-      ctx.globalAlpha = 0.9 * k;
+      ctx.globalAlpha = Math.min(1, 0.9 * k);
       ctx.drawImage(warmGlow, sx - big / 2, sy - big / 2, big, big);
       ctx.lineWidth = 1;
       const unitLen = cellH * k * pulse;
@@ -459,29 +572,86 @@
   }
 
   // ------------------------------------------------------- interaction
+  // which linked object is drawn at (or right next to) this screen position
+  function pick(px, py) {
+    const c0 = Math.floor(px / cellW), r0 = Math.floor(py / cellH);
+    let best = null, bestD = 99;
+    for (let dr = -2; dr <= 2; dr++) {
+      for (let dc = -2; dc <= 2; dc++) {
+        const c = c0 + dc, r = r0 + dr;
+        if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+        const i = ibuf[r * cols + c];
+        if (i < 0) continue;
+        const id = P[i * STRIDE + 12];
+        const d = dr * dr + dc * dc * 0.36;
+        if (id > 0 && d < bestD) { bestD = d; best = objects[id - 1]; }
+      }
+    }
+    return best;
+  }
+
+  function setHover(obj, x, y) {
+    hoverObj = obj;
+    canvas.classList.toggle('pointing', !!obj);
+    tip.classList.toggle('on', !!obj);
+    if (!obj) return;
+    tip.textContent = obj.label ? `${TYPE_NAME[obj.type]} · ${obj.label}` : TYPE_NAME[obj.type];
+    tip.style.setProperty('--accent', obj.accent);
+    tip.style.left = `${Math.min(x + 14, W - tip.offsetWidth - 8)}px`;
+    tip.style.top = `${Math.max(8, y - 34)}px`;
+  }
+
+  function activate(obj) {
+    const calm = reduced ? 'auto' : 'smooth';
+    obj.el.scrollIntoView({ behavior: calm, block: 'center' });
+    obj.el.classList.add('is-lit');
+    setTimeout(() => obj.el.classList.remove('is-lit'), 2200);
+  }
+
   canvas.addEventListener('pointerdown', (e) => {
-    dragging = true; dragX = e.clientX; dragV = 0;
+    dragging = true; moved = false;
+    dragX = downX = e.clientX; downY = e.clientY; dragV = 0;
     canvas.setPointerCapture(e.pointerId);
-    canvas.classList.add('dragging');
   });
   canvas.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
+    if (!dragging) {
+      if (e.pointerType === 'mouse') setHover(pick(e.clientX, e.clientY), e.clientX, e.clientY);
+      return;
+    }
+    if (!moved && Math.hypot(e.clientX - downX, e.clientY - downY) < 6) return;
+    if (!moved) { moved = true; setHover(null); canvas.classList.add('dragging'); }
     const dx = e.clientX - dragX;
     dragX = e.clientX;
     angle -= dx * 0.008;
     dragV = -dx * 0.008 * 60;
   });
-  const release = () => {
+  canvas.addEventListener('pointerup', (e) => {
     if (!dragging) return;
     dragging = false;
-    spin = Math.max(-6, Math.min(6, dragV || BASE_SPIN));
     canvas.classList.remove('dragging');
-  };
-  canvas.addEventListener('pointerup', release);
-  canvas.addEventListener('pointercancel', release);
-  const replay = () => { t = 0; };
-  canvas.addEventListener('dblclick', replay);
-  window.addEventListener('keydown', (e) => { if (e.key === 'r' || e.key === 'R') replay(); });
+    if (moved) { spin = clamp(dragV || BASE_SPIN, -6, 6); return; }
+    const obj = pick(e.clientX, e.clientY);
+    if (obj) activate(obj);
+  });
+  canvas.addEventListener('pointercancel', () => {
+    dragging = false;
+    canvas.classList.remove('dragging');
+  });
+  canvas.addEventListener('pointerleave', () => { if (!dragging) setHover(null); });
+
+  for (const obj of objects) {
+    const on = () => { focusObj = obj; };
+    const off = () => { if (focusObj === obj) focusObj = null; };
+    obj.el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') on(); });
+    obj.el.addEventListener('pointerleave', off);
+    obj.el.addEventListener('focus', on);
+    obj.el.addEventListener('blur', off);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.key === 'r' || e.key === 'R') && !e.metaKey && !e.ctrlKey) { t = 0; autoT = 0; }
+  });
+  window.addEventListener('scroll', readScroll, { passive: true });
   window.addEventListener('resize', resize);
 
   resize();
