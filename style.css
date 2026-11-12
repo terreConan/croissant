@@ -1,0 +1,55 @@
+:root {
+  --bg-top: #03050b;
+  --bg-bottom: #070b18;
+  --hud: #6f7a94;
+  --hud-accent: #d9737a;
+  --mono: "SF Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg-top);
+  overflow: hidden;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(var(--bg-top), var(--bg-bottom));
+}
+
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#scene {
+  cursor: grab;
+  touch-action: none;
+}
+#scene.dragging { cursor: grabbing; }
+
+/* low-res copy of the scene, blurred, for a soft bloom */
+#glow {
+  pointer-events: none;
+  filter: blur(9px) saturate(1.3);
+  opacity: 0.45;
+  mix-blend-mode: screen;
+}
+
+.hud {
+  position: absolute;
+  font: 11px/1.6 var(--mono);
+  color: var(--hud);
+  white-space: pre;
+  pointer-events: none;
+  user-select: none;
+}
+.hud-time { top: 14px; right: 18px; color: var(--hud-accent); }
+.hud-stats { left: 18px; bottom: 14px; }
