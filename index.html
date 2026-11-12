@@ -13,13 +13,16 @@
     The tree is built from this page. Any element with a data-tree attribute
     gets an object on the tree. The object appears when the element scrolls
     into view, and clicking the object scrolls to the element:
-      data-tree="ornament-red"   one red ornament   (experience)
       data-tree="ornament-blue"  one blue ornament  (education)
+      data-tree="ornament-red"   one red ornament   (experience)
       data-tree="ornament-gold"  one gold ornament  (honors)
       data-tree="present"        one present        (projects)
       data-tree="star"           the star           (contact)
     Add or remove entries and the tree follows. Text in [brackets] is placeholder.
-    Experience logos: put an image in assets/logos/ and point the entry's <img> at it.
+    Logos: put a transparent SVG or PNG in assets/logos/ and point the entry's
+    <img class="logo"> at it. It is shown bare on the dark page, with no tile.
+    Showcases: each job has a large image (<a class="shot">). Put the image in
+    assets/work/, point the <img> at it, and set the link's href to the project.
   -->
   <div class="stage" aria-hidden="true">
     <canvas id="scene"></canvas>
@@ -29,8 +32,8 @@
 
   <nav class="nav" aria-label="Sections">
     <a href="#about">About</a>
-    <a href="#experience">Experience</a>
     <a href="#education">Education</a>
+    <a href="#experience">Experience</a>
     <a href="#honors">Honors</a>
     <a href="#projects">Projects</a>
     <a href="#contact">Contact</a>
@@ -44,103 +47,107 @@
         <a href="#">GitHub</a>
         <a href="#">LinkedIn</a>
         <a href="#">Résumé</a>
-        <a href="#contact">Contact</a>
       </p>
-      <p class="hint">The tree fills in as you scroll. You can drag it around, and the ornaments are clickable.</p>
+      <p class="hint">Scroll to decorate the tree.</p>
     </section>
 
     <section id="about">
       <h2>About <span class="key">(the lights)</span></h2>
       <p>[A short paragraph about you: what you study or work on, what you're curious about, and the kind of problems you like.]</p>
-      <p>[A second paragraph if you want one: interests outside of work, what you're doing now.]</p>
-    </section>
-
-    <section id="experience" class="jobs">
-      <h2>Experience <span class="key">(red ornaments)</span></h2>
-      <article class="card job" data-tree="ornament-red" tabindex="0">
-        <img class="logo" src="assets/logos/placeholder.svg" alt="" width="48" height="48">
-        <div class="job-body">
-          <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-          <p class="role">[Role title]</p>
-          <ul>
-            <li>[What you worked on.]</li>
-            <li>[What came of it, with a number if you have one.]</li>
-          </ul>
-        </div>
-      </article>
-      <article class="card job" data-tree="ornament-red" tabindex="0">
-        <img class="logo" src="assets/logos/placeholder.svg" alt="" width="48" height="48">
-        <div class="job-body">
-          <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-          <p class="role">[Role title]</p>
-          <ul>
-            <li>[What you worked on.]</li>
-            <li>[What came of it, with a number if you have one.]</li>
-          </ul>
-        </div>
-      </article>
-      <article class="card job" data-tree="ornament-red" tabindex="0">
-        <img class="logo" src="assets/logos/placeholder.svg" alt="" width="48" height="48">
-        <div class="job-body">
-          <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-          <p class="role">[Role title]</p>
-          <ul>
-            <li>[What you worked on.]</li>
-            <li>[What came of it, with a number if you have one.]</li>
-          </ul>
-        </div>
-      </article>
-      <article class="card job" data-tree="ornament-red" tabindex="0">
-        <img class="logo" src="assets/logos/placeholder.svg" alt="" width="48" height="48">
-        <div class="job-body">
-          <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-          <p class="role">[Role title]</p>
-          <ul>
-            <li>[What you worked on.]</li>
-            <li>[What came of it, with a number if you have one.]</li>
-          </ul>
-        </div>
-      </article>
     </section>
 
     <section id="education">
       <h2>Education <span class="key">(blue ornaments)</span></h2>
-      <article class="card" data-tree="ornament-blue" tabindex="0">
-        <div class="row"><h3>[School] <span class="org">· [Degree or programme]</span></h3><span class="meta">[Start] – [End]</span></div>
-        <p>[Coursework, focus area or anything worth a line.]</p>
+      <article class="card entry" data-tree="ornament-blue" tabindex="0">
+        <div class="entry-head">
+          <img class="logo" src="assets/logos/columbia-crown.png" alt="" width="36" height="36">
+          <div class="entry-body">
+            <div class="row"><h3>Columbia University</h3><span class="meta">[Start] – [End]</span></div>
+            <p>[Degree or programme]</p>
+            <p class="detail">[Coursework, focus area or anything worth a line.]</p>
+            </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="experience">
+      <h2>Experience <span class="key">(red ornaments)</span></h2>
+      <article class="card entry" data-tree="ornament-red" tabindex="0">
+        <div class="entry-head">
+          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
+          <div class="entry-body">
+            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
+            <p>[Role title]</p>
+            <p class="detail">[One line on what you did and what came of it.]</p>
+            </div>
+        </div>
+        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
+      </article>
+      <article class="card entry" data-tree="ornament-red" tabindex="0">
+        <div class="entry-head">
+          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
+          <div class="entry-body">
+            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
+            <p>[Role title]</p>
+            <p class="detail">[One line on what you did and what came of it.]</p>
+            </div>
+        </div>
+        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
+      </article>
+      <article class="card entry" data-tree="ornament-red" tabindex="0">
+        <div class="entry-head">
+          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
+          <div class="entry-body">
+            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
+            <p>[Role title]</p>
+            <p class="detail">[One line on what you did and what came of it.]</p>
+            </div>
+        </div>
+        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
+      </article>
+      <article class="card entry" data-tree="ornament-red" tabindex="0">
+        <div class="entry-head">
+          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
+          <div class="entry-body">
+            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
+            <p>[Role title]</p>
+            <p class="detail">[One line on what you did and what came of it.]</p>
+            </div>
+        </div>
+        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
       </article>
     </section>
 
     <section id="honors">
       <h2>Honors <span class="key">(gold ornaments)</span></h2>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
-        <p>[One line on what it recognises.]</p>
+        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
+        <p class="detail">[Awarding body]</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
-        <p>[One line on what it recognises.]</p>
+        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
+        <p class="detail">[Awarding body]</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
-        <p>[One line on what it recognises.]</p>
+        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
+        <p class="detail">[Awarding body]</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award] <span class="org">· [Awarding body]</span></h3><span class="meta">[Year]</span></div>
-        <p>[One line on what it recognises.]</p>
+        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
+        <p class="detail">[Awarding body]</p>
       </article>
     </section>
 
     <section id="projects">
       <h2>Projects <span class="key">(presents)</span></h2>
       <article class="card" data-tree="present" tabindex="0">
-        <div class="row"><h3>[Project name] <span class="org">· [Stack or tools]</span></h3><span class="meta">[Year]</span></div>
-        <p>[What it does and why you built it.]</p>
+        <div class="row"><h3>[Project name]</h3><span class="meta">[Year]</span></div>
+        <p class="detail">[What it does and why you built it.]</p>
         <p class="links"><a href="#">Code</a><a href="#">Demo</a></p>
       </article>
       <article class="card" data-tree="present" tabindex="0">
-        <div class="row"><h3>[Project name] <span class="org">· [Stack or tools]</span></h3><span class="meta">[Year]</span></div>
-        <p>[What it does and why you built it.]</p>
+        <div class="row"><h3>[Project name]</h3><span class="meta">[Year]</span></div>
+        <p class="detail">[What it does and why you built it.]</p>
         <p class="links"><a href="#">Code</a><a href="#">Demo</a></p>
       </article>
     </section>
@@ -148,7 +155,6 @@
     <section id="contact">
       <h2>Contact <span class="key">(the star)</span></h2>
       <article class="card" data-tree="star" data-label="Contact" tabindex="0">
-        <p>[A line on what you're open to: internships, collaborations, a chat.]</p>
         <p class="links">
           <a href="#">Email</a>
           <a href="#">GitHub</a>

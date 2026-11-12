@@ -267,7 +267,7 @@
   pts.length = 0;
 
   // -------------------------------------------------------------- snow
-  const FLAKES = 150;
+  const FLAKES = 380;
   const flakes = new Float32Array(FLAKES * 5);       // x, y, speed, size, phase
   for (let i = 0; i < FLAKES; i++) {
     const depth = rnd();
@@ -281,6 +281,7 @@
   const LIGHT_DIR = unit(-0.45, 0.72, -0.55);
 
   let W = 0, H = 0, dpr = 1, cellW = 6, cellH = 10, cols = 0, rows = 0, focal = 1;
+  let wide = true;
   let originX = 0, originY = 0;        // where the tree's look-at point lands on screen
   let zbuf, ibuf, groundR, groundHash;
 
@@ -291,11 +292,11 @@
     glowCanvas.width = Math.max(1, Math.round(W / 4));
     glowCanvas.height = Math.max(1, Math.round(H / 4));
 
-    // wide: tree on the left, text on the right. narrow: tree up top, text over it.
-    const wide = W >= 900;
+    // wide: tree on the left, text on the right. narrow: tree in a band above the text.
+    wide = window.innerWidth >= 900;
     originX = wide ? W * 0.31 : W * 0.5;
-    originY = wide ? H * 0.5 : H * 0.36;
-    focal = wide ? Math.min(1.68 * H, 3.3 * W * 0.52) : Math.min(1.2 * H, 3.3 * W);
+    originY = H * 0.5;
+    focal = wide ? Math.min(1.68 * H, 3.3 * W * 0.52) : Math.min(1.62 * H, 3.3 * W);
     cellH = Math.max(5, (focal * 0.4) / 64);
     cellW = cellH * 0.6;
     cols = Math.ceil(W / cellW); rows = Math.ceil(H / cellH);
@@ -341,7 +342,6 @@
     x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
     return c;
   };
-  const warmGlow = sprite(255, 196, 100);
   const whiteGlow = sprite(255, 250, 240);
   const bulbGlow = BULBS.map((c) => sprite(...c.map((v) => Math.round(v * 255))));
 
@@ -455,8 +455,9 @@
       const cell = Math.floor(py / cellH) * cols + Math.floor(px / cellW);
       if (depth < 0.85 && ibuf[cell] >= 0) continue;
       const tw = 0.55 + 0.45 * Math.sin(clock * (0.6 + depth) + flakes[o + 4] * 3);
-      const s = 0.8 + 1.5 * depth * depth;
-      ctx.fillStyle = `rgba(244,236,222,${(0.15 + 0.6 * depth) * tw})`;
+      const s = 0.9 + 1.8 * depth * depth;
+      const quiet = wide && px > originX * 1.75 ? 0.4 : 1;      // keep it calm behind the text
+      ctx.fillStyle = `rgba(244,236,222,${(0.2 + 0.7 * depth) * tw * quiet})`;
       ctx.fillRect(px, py, s, s);
     }
 
@@ -531,43 +532,21 @@
       }
     }
 
-    // additive glows: bulbs, the highlighted object, then the star and its rays
+    // additive glows: bulbs, then the highlighted object
     ctx.globalCompositeOperation = 'lighter';
     const gs = cellH * 5.5;
     for (let i = 0; i < visLights.length; i += 4) {
       ctx.globalAlpha = visLights[i + 2] * 0.8;
       ctx.drawImage(bulbGlow[visLights[i + 3]], visLights[i] - gs / 2, visLights[i + 1] - gs / 2, gs, gs);
     }
-    if (hl && hl.type !== 'star' && hl.birth <= t) {
+    if (hl && hl.birth <= t) {
       const [x, y, z] = hl.pos;
       const zr = -x * sa + z * ca;
-      if (zr < 0.25) {                       // only when it's on the near side
+      if (zr < 0.25 || hl.type === 'star') { // only when it's on the near side
         const [sx, sy] = project(x * ca + z * sa, y, zr);
         const size = cellH * (hl.type === 'present' ? 20 : 13);
         ctx.globalAlpha = 0.5 + 0.3 * hlPulse;
         ctx.drawImage(whiteGlow, sx - size / 2, sy - size / 2, size, size);
-      }
-    }
-    if (t > T_STAR) {
-      const k = Math.pow(Math.min(1, (t - T_STAR) / 1.6), 2) * (hl && hl.type === 'star' ? 1.25 : 1);
-      const [sx, sy] = project(0, STAR_Y, 0);
-      const pulse = 0.85 + 0.15 * Math.sin(clock * 2.4);
-      const big = cellH * 22 * k * pulse;
-      ctx.globalAlpha = Math.min(1, 0.9 * k);
-      ctx.drawImage(warmGlow, sx - big / 2, sy - big / 2, big, big);
-      ctx.lineWidth = 1;
-      const unitLen = cellH * k * pulse;
-      const rays = [[-90, 10], [-64, 7], [-116, 7], [0, 8], [180, 8], [90, 5], [58, 4], [122, 4], [-32, 3.5], [-148, 3.5]];
-      for (const [deg, len] of rays) {
-        const a = (deg * Math.PI) / 180, dx = Math.cos(a), dy = Math.sin(a);
-        const g = ctx.createLinearGradient(sx, sy, sx + dx * len * unitLen, sy + dy * len * unitLen);
-        g.addColorStop(0, 'rgba(255,214,120,0.9)');
-        g.addColorStop(1, 'rgba(255,214,120,0)');
-        ctx.strokeStyle = g;
-        ctx.beginPath();
-        ctx.moveTo(sx + dx * unitLen, sy + dy * unitLen);
-        ctx.lineTo(sx + dx * len * unitLen, sy + dy * len * unitLen);
-        ctx.stroke();
       }
     }
     ctx.globalAlpha = 1;
@@ -609,7 +588,7 @@
 
   function activate(obj) {
     const calm = reduced ? 'auto' : 'smooth';
-    obj.el.scrollIntoView({ behavior: calm, block: 'center' });
+    obj.el.scrollIntoView({ behavior: calm, block: wide ? 'center' : 'end' });
     obj.el.classList.add('is-lit');
     setTimeout(() => obj.el.classList.remove('is-lit'), 2200);
   }
@@ -661,5 +640,6 @@
   window.addEventListener('resize', resize);
 
   resize();
+  render();                  // paint once right away, before the first animation frame
   requestAnimationFrame((now) => { last = now; requestAnimationFrame(frame); });
 })();

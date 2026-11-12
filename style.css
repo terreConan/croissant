@@ -1,11 +1,12 @@
 :root {
-  --bg-top: #0c0908;
-  --bg-bottom: #16100d;
+  --bg: #0d0a09;
   --text: #cfc7ba;
   --dim: #857c70;
   --strong: #f4eee3;
   --font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
+  --band: 46vh;                  /* height of the tree band on phones */
 }
+@supports (height: 1svh) { :root { --band: 46svh; } }
 
 * { box-sizing: border-box; }
 
@@ -13,9 +14,9 @@ html { scroll-behavior: smooth; }
 
 html, body {
   margin: 0;
-  background: var(--bg-top);
+  background: var(--bg);
   color: var(--text);
-  font: 16px/1.55 var(--font);
+  font: 15px/1.6 var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -24,7 +25,7 @@ html, body {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(var(--bg-top), var(--bg-bottom));
+  background: var(--bg);
 }
 
 .stage canvas {
@@ -70,15 +71,15 @@ html, body {
   z-index: 2;
   display: flex;
   gap: 18px;
-  font-size: 14px;
+  font-size: 13px;
 }
 .nav a { color: var(--dim); text-decoration: none; }
-.nav a:hover, .nav a:focus-visible { color: var(--strong); text-decoration: underline; }
+.nav a:hover, .nav a:focus-visible { color: var(--strong); }
 
 .content {
   position: relative;
   z-index: 1;
-  width: min(460px, 40vw);
+  width: min(480px, 42vw);
   margin: 0 clamp(24px, 6vw, 110px) 0 auto;
   padding-bottom: 45vh;
   pointer-events: none;          /* let drags reach the tree between entries */
@@ -88,26 +89,25 @@ html, body {
 section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 22vh 0;
+  gap: 16px;
+  padding: 20vh 0;
 }
-.hero { min-height: 100vh; justify-content: center; padding: 0; }
+.hero { min-height: 100vh; justify-content: center; gap: 10px; padding: 0; }
 
 h1, h2, h3 { margin: 0; color: var(--strong); font-size: 1em; font-weight: 600; }
-h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; }
-p, ul { margin: 0; }
+h1 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
+h2 { font-weight: 400; color: var(--dim); }
+.key { opacity: 0.7; }
+p { margin: 0; }
 
-.key, .org, .meta, .hint { color: var(--dim); font-weight: 400; }
-.hint { font-size: 14px; }
+.meta, .hint, .detail { color: var(--dim); }
+.meta { flex: none; font-variant-numeric: tabular-nums; }
 
 .card {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  cursor: pointer;
   outline: none;
 }
-.card + .card { margin-top: 10px; }
 /* clicking an ornament briefly marks the entry it belongs to */
 .card h3 { transition: color 0.3s; }
 .card.is-lit h3, .card:focus-visible h3 { color: var(--accent, var(--strong)); }
@@ -118,58 +118,72 @@ p, ul { margin: 0; }
   justify-content: space-between;
   gap: 16px;
 }
-.meta { flex: none; font-variant-numeric: tabular-nums; }
 
-/* experience: each job gets room of its own */
-.jobs { gap: 0; }
-.jobs h2 { margin-bottom: 14px; }
-.job {
-  flex-direction: row;
+/* education and experience: a bare logo beside the entry */
+.entry-head {
+  display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 26px 0;
+  gap: 14px;
 }
-.job + .job { margin-top: 30px; }
+.entry + .entry { margin-top: 22px; }
+.entry-body { flex: 1; min-width: 0; }
 .logo {
   flex: none;
-  width: 48px;
-  height: 48px;
-  margin-top: 2px;
-  border-radius: 8px;
-  object-fit: cover;
+  width: 36px;
+  height: 36px;
+  margin-top: 4px;
+  object-fit: contain;
 }
-.job-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.job h3 { font-size: 18px; }
-.job ul { margin-top: 8px; padding-left: 18px; }
-.job li + li { margin-top: 4px; }
+
+/* experience: each job stands apart, with a large image of the work beneath it */
+#experience .entry + .entry { margin-top: 96px; }
+.shot {
+  display: block;
+  margin-top: 18px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  transition: opacity 0.2s;
+}
+.shot:hover img, .shot:focus-visible img { opacity: 0.85; }
 
 .links { display: flex; flex-wrap: wrap; gap: 2px 16px; }
-.links a { color: var(--strong); text-underline-offset: 3px; }
-.links a:hover, .links a:focus-visible { color: var(--text); }
+.links a { color: var(--strong); text-underline-offset: 3px; text-decoration-color: var(--dim); }
+.links a:hover, .links a:focus-visible { text-decoration-color: currentColor; }
 
 /* ----------------------------------------------------------- phone */
+/* the tree gets a band of its own at the top, and the text scrolls below it */
 @media (max-width: 899px) {
-  .nav { top: 0; left: 0; right: 0; padding: 12px 16px; justify-content: space-between; gap: 4px; font-size: 12px; background: rgba(13, 10, 9, 0.92); }
-  .content { width: auto; margin: 0; padding: 0 0 30vh; }
-  section { gap: 0; padding: 62vh 0 0; }
-  .hero { justify-content: flex-end; }
-  /* the tree is behind the text here, so each block sits on a dark backing */
-  section > * {
-    padding: 7px 22px;
-    background: rgba(13, 10, 9, 0.92);
+  .stage { bottom: auto; height: var(--band); z-index: 2; }
+  .stage::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -24px;
+    height: 24px;
+    background: linear-gradient(var(--bg), transparent);
+    pointer-events: none;
   }
-  section > :first-child {
-    padding-top: 30px;
-    background: linear-gradient(rgba(13, 10, 9, 0), rgba(13, 10, 9, 0.92) 30px);
+  .nav { display: none; }
+  .content {
+    width: auto;
+    margin: 0;
+    padding: var(--band) 24px 30vh;
+    pointer-events: auto;
   }
-  section > :last-child { padding-bottom: 30px; }
-  .card + .card { margin-top: 0; padding-top: 12px; }
-  .jobs h2 { margin-bottom: 0; }
-  .job, .job + .job { margin-top: 0; padding: 20px 22px; }
-  .logo { width: 40px; height: 40px; }
+  section { padding: 56px 0; scroll-margin-top: var(--band); }
+  #experience .entry + .entry { margin-top: 64px; }
+  .hero { min-height: calc(100vh - var(--band)); justify-content: flex-start; padding: 40px 0 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .card h3 { transition: none; }
+  .card h3, .shot img { transition: none; }
 }
