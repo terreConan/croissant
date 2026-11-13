@@ -4,7 +4,20 @@
   --dim: #857c70;
   --strong: #f4eee3;
   --font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
+  /* the typewriter face the tree is drawn in, for the small print */
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --tip: #1b1512;
+  --veil: rgba(13, 10, 9, 0.8);
   --band: 46vh;                  /* height of the tree band on phones */
+}
+/* summer: the same page on a deep blue */
+:root[data-theme="summer"] {
+  --bg: #2b3dc3;
+  --text: #e3e7ff;
+  --dim: #aab4f2;
+  --strong: #ffffff;
+  --tip: #1f2c98;
+  --veil: rgba(22, 32, 120, 0.8);
 }
 @supports (height: 1svh) { :root { --band: 46svh; } }
 
@@ -51,17 +64,46 @@ html, body {
   mix-blend-mode: screen;
 }
 
+:root[data-theme="summer"] #glow { opacity: 0.28; }   /* less haze on the bright blue */
+
 .tip {
   position: absolute;
   padding: 3px 8px;
   font-size: 13px;
   color: var(--strong);
-  background: #1b1512;
+  background: var(--tip);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
 }
 .tip.on { opacity: 1; }
+
+/* the switch between the winter and summer scenes */
+.season {
+  position: fixed;
+  left: 26px;
+  top: 18px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: 16px var(--font);
+  cursor: pointer;
+}
+.season:hover, .season:focus-visible { color: var(--strong); }
+.season-dot {
+  width: 22px;
+  height: 22px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  transition: transform 0.4s ease;
+}
+:root[data-theme="summer"] .season-dot { transform: rotate(180deg); }
 
 /* --------------------------------------------------------- content */
 .nav {
@@ -71,7 +113,6 @@ html, body {
   z-index: 2;
   display: flex;
   gap: 18px;
-  font-size: 13px;
 }
 .nav a { color: var(--dim); text-decoration: none; }
 .nav a:hover, .nav a:focus-visible { color: var(--strong); }
@@ -101,7 +142,8 @@ h2 { font-weight: 400; color: var(--dim); }
 p { margin: 0; }
 
 .meta, .hint, .detail { color: var(--dim); }
-.meta { flex: none; font-variant-numeric: tabular-nums; }
+.meta { flex: none; }
+.meta, .hint, .nav { font-family: var(--mono); font-size: 12px; }
 
 .card {
   display: flex;
@@ -119,20 +161,14 @@ p { margin: 0; }
   gap: 16px;
 }
 
-/* education and experience: a bare logo beside the entry */
-.entry-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
+/* education and experience: a bare logo in front of the entry's title */
 .entry + .entry { margin-top: 22px; }
-.entry-body { flex: 1; min-width: 0; }
+.entry .row { align-items: center; gap: 10px; margin-bottom: 8px; }
+.entry .row h3 { flex: 1; }
 .logo {
   flex: none;
-  width: 36px;
-  height: 36px;
-  margin-top: 4px;
-  object-fit: contain;
+  width: auto;                     /* each as wide as its own shape, so the gap to the title is even */
+  height: var(--h, 28px);           /* set --h on a logo to balance a wide or narrow one */
 }
 
 /* experience: each job stands apart, with a large image of the work beneath it */
@@ -152,10 +188,63 @@ p { margin: 0; }
   transition: opacity 0.2s;
 }
 .shot:hover img, .shot:focus-visible img { opacity: 0.85; }
+video.shot { width: 100%; aspect-ratio: 16 / 9; background: #000; }
+/* projects: a row of small images */
+.shots { display: flex; gap: 12px; margin-top: 12px; }
+.shots .shot { flex: 1; margin-top: 0; }
+.shot.banner { margin-top: 12px; }
+.shot.banner img { aspect-ratio: auto; }
 
+.detail a { color: inherit; text-underline-offset: 3px; }
+.detail a:hover, .detail a:focus-visible { color: var(--strong); }
 .links { display: flex; flex-wrap: wrap; gap: 2px 16px; }
 .links a { color: var(--strong); text-underline-offset: 3px; text-decoration-color: var(--dim); }
 .links a:hover, .links a:focus-visible { text-decoration-color: currentColor; }
+
+/* hobbies: the entry opens its photo, as the polaroid on the tree does */
+.photo { cursor: zoom-in; }
+.photo + .photo { margin-top: 6px; }
+
+/* the photos of a polaroid: wheels of photos over the blurred site */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  background: var(--veil);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  cursor: zoom-out;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.lightbox[hidden] { display: none; }
+.lightbox.open { opacity: 1; }
+.lightbox img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  object-fit: cover;
+  border-radius: 3px;
+  cursor: pointer;
+  /* on the rim the photos are a little faded and soft; the large one is clear */
+  filter: saturate(0.8) brightness(0.8) blur(0.5px);
+  transition: filter 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.lightbox img.hot { filter: none; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6); cursor: zoom-out; }
+.wheel-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  pointer-events: none;
+}
 
 /* ----------------------------------------------------------- phone */
 /* the tree gets a band of its own at the top, and the text scrolls below it */
@@ -172,6 +261,7 @@ p { margin: 0; }
     pointer-events: none;
   }
   .nav { display: none; }
+  .season { left: 14px; top: 8px; font-size: 15px; }
   .content {
     width: auto;
     margin: 0;
@@ -185,5 +275,5 @@ p { margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .card h3, .shot img { transition: none; }
+  .card h3, .shot img, .lightbox, .lightbox img, .season-dot { transition: none; }
 }

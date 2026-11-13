@@ -15,14 +15,26 @@
     into view, and clicking the object scrolls to the element:
       data-tree="ornament-blue"  one blue ornament  (education)
       data-tree="ornament-red"   one red ornament   (experience)
-      data-tree="ornament-gold"  one gold ornament  (honors)
+      data-tree="ornament-gold"  one yellow ornament (honors)
       data-tree="present"        one present        (projects)
+      data-tree="polaroid"       one polaroid       (hobbies)
       data-tree="star"           the star           (contact)
     Add or remove entries and the tree follows. Text in [brackets] is placeholder.
+    Seasons: the button switches to a summer scene (a beach umbrella) built from
+    the same entries: bunting flags for ornaments, beach balls for presents, the
+    polaroids in a basket, the sun for the star. A data-summer attribute holds
+    the wording an element shows in summer.
     Logos: put a transparent SVG or PNG in assets/logos/ and point the entry's
-    <img class="logo"> at it. It is shown bare on the dark page, with no tile.
-    Showcases: each job has a large image (<a class="shot">). Put the image in
-    assets/work/, point the <img> at it, and set the link's href to the project.
+    <img class="logo"> at it. It sits in front of the entry's title, bare on the
+    dark page. Links that leave the page open in a new tab.
+    Showcases: each job has a large image (<a class="shot">) or a <video class="shot">.
+    Put the file in assets/work/, point at it, and set the link's href to the
+    project. Projects can carry a row of small ones (<div class="shots">).
+    Polaroids: put photos in assets/photos/ and list them inside the entry as
+    <ul class="photos" hidden><li data-src="..." data-w="..." data-h="..."></li></ul>
+    (data-w and data-h are the image's pixel size), or in a data-photo attribute
+    separated by " | ". The polaroid on the tree is drawn from the first one,
+    and clicking it (or the entry) opens them on wheels you can scroll.
   -->
   <div class="stage" aria-hidden="true">
     <canvas id="scene"></canvas>
@@ -30,12 +42,18 @@
     <div class="tip" id="tip"></div>
   </div>
 
+  <button class="season" id="season" type="button">
+    <span class="season-dot" aria-hidden="true"></span>
+    <span data-summer="A little snow?">A little warmth?</span>
+  </button>
+
   <nav class="nav" aria-label="Sections">
     <a href="#about">About</a>
     <a href="#education">Education</a>
     <a href="#experience">Experience</a>
     <a href="#honors">Honors</a>
     <a href="#projects">Projects</a>
+    <a href="#hobbies">Hobbies</a>
     <a href="#contact">Contact</a>
   </nav>
 
@@ -43,12 +61,7 @@
     <section class="hero" id="top">
       <h1>Andrew Shin</h1>
       <p>[One line on what you build and what you're looking for.]</p>
-      <p class="links">
-        <a href="#">GitHub</a>
-        <a href="#">LinkedIn</a>
-        <a href="#">Résumé</a>
-      </p>
-      <p class="hint">Scroll to decorate the tree.</p>
+      <p class="hint" data-summer="Scroll to set up the beach.">Scroll to decorate the tree.</p>
     </section>
 
     <section id="about">
@@ -57,113 +70,236 @@
     </section>
 
     <section id="education">
-      <h2>Education <span class="key">(blue ornaments)</span></h2>
+      <h2>Education <span class="key" data-summer="(blue flags)">(blue ornaments)</span></h2>
       <article class="card entry" data-tree="ornament-blue" tabindex="0">
-        <div class="entry-head">
-          <img class="logo" src="assets/logos/columbia-crown.png" alt="" width="36" height="36">
-          <div class="entry-body">
-            <div class="row"><h3>Columbia University</h3><span class="meta">[Start] – [End]</span></div>
-            <p>[Degree or programme]</p>
-            <p class="detail">[Coursework, focus area or anything worth a line.]</p>
-            </div>
-        </div>
+        <div class="row"><img class="logo" src="assets/logos/columbia-crown.png" alt="" style="--h: 23px"><h3>Columbia University</h3><span class="meta">[Start] – [End]</span></div>
+        <p>[Degree or programme]</p>
+        <p class="detail">[Coursework, focus area or anything worth a line]</p>
       </article>
     </section>
 
     <section id="experience">
-      <h2>Experience <span class="key">(red ornaments)</span></h2>
+      <h2>Experience <span class="key" data-summer="(red flags)">(red ornaments)</span></h2>
       <article class="card entry" data-tree="ornament-red" tabindex="0">
-        <div class="entry-head">
-          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
-          <div class="entry-body">
-            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-            <p>[Role title]</p>
-            <p class="detail">[One line on what you did and what came of it.]</p>
-            </div>
-        </div>
+        <div class="row"><img class="logo" src="assets/logos/sep.png" alt="Stanford Encyclopedia of Philosophy"><h3>InPhO</h3><span class="meta">Apr 2025 – Present</span></div>
+        <p>Research Assistant, Internet Philosophy Ontology Project</p>
+        <p class="detail">Restored InPhO inside the Stanford Encyclopedia of Philosophy for 300,000 weekly readers; ran a 712-comparison study of how AI and people understand philosophy</p>
+        <a class="shot" href="https://www.inphoproject.org/"><img src="assets/work/inpho.jpg" alt="The InPhO Project home page" width="1600" height="1000" loading="lazy"></a>
+      </article>
+      <article class="card entry" data-tree="ornament-red" tabindex="0">
+        <div class="row"><img class="logo" src="assets/logos/brown.png" alt="" style="--h: 30px"><h3>Brown University</h3><span class="meta">[Start] – [End]</span></div>
+        <p>Student Researcher</p>
+        <p class="detail">1st place in Computer Science and Systems Software at the 71st GSDSEF</p>
+        <a class="shot" href="assets/work/harmonization.pdf"><img src="assets/work/harmonization.jpg" alt="Research poster: Harmonizing Human Attention and Deep Neural Networks" width="1600" height="1000" loading="lazy"></a>
+      </article>
+      <article class="card entry" data-tree="ornament-red" tabindex="0">
+        <div class="row"><img class="logo" src="assets/logos/columbia-space-initiative.png" alt=""><h3>Columbia Space Initiative</h3><span class="meta">[Start] – [End]</span></div>
+        <p>Navigation Team</p>
+        <p class="detail">[One line on what you did and what came of it]</p>
         <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
       </article>
       <article class="card entry" data-tree="ornament-red" tabindex="0">
-        <div class="entry-head">
-          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
-          <div class="entry-body">
-            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-            <p>[Role title]</p>
-            <p class="detail">[One line on what you did and what came of it.]</p>
-            </div>
-        </div>
-        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
-      </article>
-      <article class="card entry" data-tree="ornament-red" tabindex="0">
-        <div class="entry-head">
-          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
-          <div class="entry-body">
-            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-            <p>[Role title]</p>
-            <p class="detail">[One line on what you did and what came of it.]</p>
-            </div>
-        </div>
-        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
-      </article>
-      <article class="card entry" data-tree="ornament-red" tabindex="0">
-        <div class="entry-head">
-          <img class="logo" src="assets/logos/placeholder.svg" alt="" width="36" height="36">
-          <div class="entry-body">
-            <div class="row"><h3>[Organization]</h3><span class="meta">[Start] – [End]</span></div>
-            <p>[Role title]</p>
-            <p class="detail">[One line on what you did and what came of it.]</p>
-            </div>
-        </div>
-        <a class="shot" href="#"><img src="assets/work/placeholder.svg" alt="[What this image shows]" width="1600" height="1000" loading="lazy"></a>
+        <div class="row"><img class="logo" src="assets/logos/camp-lapulapu.png" alt="Camp Lapulapu Elementary School"><h3>Project GPT Plus</h3><span class="meta">Dec 2024 – Sep 2025</span></div>
+        <p>AI Team Lead</p>
+        <p class="detail">Built storybook LLMs for K-6 readers and took them live at a 2,000-student elementary school in Cebu, Philippines</p>
+        <video class="shot" controls playsinline preload="none" poster="assets/work/project-gpt-plus-poster.jpg" src="assets/work/project-gpt-plus.mp4" aria-label="Project GPT Plus demo video"></video>
       </article>
     </section>
 
     <section id="honors">
-      <h2>Honors <span class="key">(gold ornaments)</span></h2>
+      <h2>Honors <span class="key" data-summer="(yellow flags)">(yellow ornaments)</span></h2>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
-        <p class="detail">[Awarding body]</p>
+        <h3>International Logic Olympiad</h3>
+        <p class="detail">2nd and 4th worldwide; hosted by Stanford, sponsored by Jane Street</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
-        <p class="detail">[Awarding body]</p>
+        <h3>American Computer Science League</h3>
+        <p class="detail">Gold Medalist using C++</p>
       </article>
       <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
-        <p class="detail">[Awarding body]</p>
-      </article>
-      <article class="card" data-tree="ornament-gold" tabindex="0">
-        <div class="row"><h3>[Honor or award]</h3><span class="meta">[Year]</span></div>
-        <p class="detail">[Awarding body]</p>
+        <h3>Conrad Innovator</h3>
+        <p class="detail">YOLOv8 glasses for hazards</p>
       </article>
     </section>
 
     <section id="projects">
-      <h2>Projects <span class="key">(presents)</span></h2>
+      <h2>Projects <span class="key" data-summer="(beach balls)">(presents)</span></h2>
       <article class="card" data-tree="present" tabindex="0">
-        <div class="row"><h3>[Project name]</h3><span class="meta">[Year]</span></div>
-        <p class="detail">[What it does and why you built it.]</p>
-        <p class="links"><a href="#">Code</a><a href="#">Demo</a></p>
+        <div class="row"><h3>CUTC</h3><span class="meta">Present</span></div>
+        <p class="detail">[Algo team: one line on what you built for the trading challenge]</p>
       </article>
       <article class="card" data-tree="present" tabindex="0">
-        <div class="row"><h3>[Project name]</h3><span class="meta">[Year]</span></div>
-        <p class="detail">[What it does and why you built it.]</p>
-        <p class="links"><a href="#">Code</a><a href="#">Demo</a></p>
+        <div class="row"><h3>Double Pendulums</h3><span class="meta">2026</span></div>
+        <p class="detail">The butterfly effect, shown by mapping double pendulums in Next.js; designed after Dieter Rams</p>
+        <div class="shots">
+          <a class="shot" href="https://doublependulums.vercel.app"><img src="assets/work/double-pendulums.jpg" alt="The chaos map of a double pendulum" width="800" height="514" loading="lazy"></a>
+          <a class="shot" href="https://doublependulums.vercel.app"><img src="assets/work/double-pendulums-momentum.jpg" alt="The momentum map of a double pendulum" width="800" height="514" loading="lazy"></a>
+        </div>
+      </article>
+      <article class="card" data-tree="present" tabindex="0">
+        <div class="row"><h3>Philodom</h3><span class="meta">2025</span></div>
+        <p class="detail">RAG for conversing with philosophers; accepted to the <a href="https://philosophydata.com/">Philosophy Data Project</a></p>
+        <a class="shot banner" href="https://philosophydata.com/"><img src="assets/work/philodom.jpg" alt="The Philosophy Data Project banner" width="1600" height="613" loading="lazy"></a>
+      </article>
+    </section>
+
+    <section id="hobbies">
+      <h2>Hobbies <span class="key">(the polaroids)</span></h2>
+      <article class="card photo" data-tree="polaroid" tabindex="0" role="button">
+        <h3>Museum traipsing</h3>
+        <p class="detail">[One line about it]</p>
+        <ul class="photos" hidden>
+          <li data-src="assets/photos/museums/01.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/museums/02.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/museums/03.jpg" data-w="628" data-h="900"></li>
+          <li data-src="assets/photos/museums/04.jpg" data-w="587" data-h="900"></li>
+          <li data-src="assets/photos/museums/05.jpg" data-w="635" data-h="900"></li>
+          <li data-src="assets/photos/museums/06.jpg" data-w="570" data-h="900"></li>
+          <li data-src="assets/photos/museums/07.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/museums/08.jpg" data-w="900" data-h="659"></li>
+          <li data-src="assets/photos/museums/09.jpg" data-w="764" data-h="900"></li>
+          <li data-src="assets/photos/museums/10.jpg" data-w="804" data-h="900"></li>
+          <li data-src="assets/photos/museums/11.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/museums/12.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/museums/13.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/museums/14.jpg" data-w="734" data-h="900"></li>
+          <li data-src="assets/photos/museums/15.jpg" data-w="797" data-h="900"></li>
+          <li data-src="assets/photos/museums/16.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/museums/17.jpg" data-w="720" data-h="900"></li>
+          <li data-src="assets/photos/museums/18.jpg" data-w="574" data-h="900"></li>
+          <li data-src="assets/photos/museums/19.jpg" data-w="900" data-h="867"></li>
+          <li data-src="assets/photos/museums/20.jpg" data-w="893" data-h="900"></li>
+          <li data-src="assets/photos/museums/21.jpg" data-w="750" data-h="900"></li>
+          <li data-src="assets/photos/museums/22.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/museums/23.jpg" data-w="900" data-h="371"></li>
+          <li data-src="assets/photos/museums/24.jpg" data-w="755" data-h="900"></li>
+          <li data-src="assets/photos/museums/25.jpg" data-w="637" data-h="900"></li>
+          <li data-src="assets/photos/museums/26.jpg" data-w="589" data-h="900"></li>
+          <li data-src="assets/photos/museums/27.jpg" data-w="900" data-h="706"></li>
+          <li data-src="assets/photos/museums/28.jpg" data-w="759" data-h="900"></li>
+          <li data-src="assets/photos/museums/29.jpg" data-w="810" data-h="900"></li>
+          <li data-src="assets/photos/museums/30.jpg" data-w="631" data-h="900"></li>
+          <li data-src="assets/photos/museums/31.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/museums/32.jpg" data-w="675" data-h="900"></li>
+        </ul>
+      </article>
+      <article class="card photo" data-tree="polaroid" tabindex="0" role="button">
+        <h3>Traveling and cooking</h3>
+        <p class="detail">[One line about it]</p>
+        <ul class="photos" hidden>
+          <li data-src="assets/photos/travel/01.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/02.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/03.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/04.jpg" data-w="706" data-h="900"></li>
+          <li data-src="assets/photos/travel/05.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/06.jpg" data-w="900" data-h="715"></li>
+          <li data-src="assets/photos/travel/07.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/08.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/09.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/10.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/11.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/12.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/13.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/14.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/15.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/16.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/17.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/18.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/19.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/20.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/21.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/22.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/23.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/24.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/25.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/26.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/27.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/28.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/29.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/30.jpg" data-w="900" data-h="714"></li>
+          <li data-src="assets/photos/travel/31.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/32.jpg" data-w="705" data-h="900"></li>
+          <li data-src="assets/photos/travel/33.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/34.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/35.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/36.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/37.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/38.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/39.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/40.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/41.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/42.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/43.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/44.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/45.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/46.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/47.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/travel/48.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/travel/49.jpg" data-w="675" data-h="900"></li>
+        </ul>
+      </article>
+      <article class="card photo" data-tree="polaroid" tabindex="0" role="button">
+        <h3>Friends</h3>
+        <p class="detail">[A line of thanks to them]</p>
+        <ul class="photos" hidden>
+          <li data-src="assets/photos/friends/27.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/02.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/03.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/04.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/05.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/06.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/07.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/08.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/09.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/10.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/11.jpg" data-w="754" data-h="565"></li>
+          <li data-src="assets/photos/friends/12.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/13.jpg" data-w="720" data-h="540"></li>
+          <li data-src="assets/photos/friends/14.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/15.jpg" data-w="900" data-h="506"></li>
+          <li data-src="assets/photos/friends/16.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/17.jpg" data-w="800" data-h="600"></li>
+          <li data-src="assets/photos/friends/18.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/19.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/20.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/21.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/22.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/23.jpg" data-w="612" data-h="816"></li>
+          <li data-src="assets/photos/friends/24.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/25.jpg" data-w="676" data-h="900"></li>
+          <li data-src="assets/photos/friends/26.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/01.jpg" data-w="900" data-h="642"></li>
+          <li data-src="assets/photos/friends/28.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/29.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/30.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/31.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/32.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/33.jpg" data-w="506" data-h="900"></li>
+          <li data-src="assets/photos/friends/34.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/35.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/36.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/37.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/38.jpg" data-w="675" data-h="900"></li>
+          <li data-src="assets/photos/friends/39.jpg" data-w="900" data-h="675"></li>
+          <li data-src="assets/photos/friends/40.jpg" data-w="900" data-h="675"></li>
+        </ul>
       </article>
     </section>
 
     <section id="contact">
-      <h2>Contact <span class="key">(the star)</span></h2>
+      <h2>Contact <span class="key" data-summer="(the sun)">(the star)</span></h2>
       <article class="card" data-tree="star" data-label="Contact" tabindex="0">
         <p class="links">
-          <a href="#">Email</a>
-          <a href="#">GitHub</a>
-          <a href="#">LinkedIn</a>
-          <a href="#">Résumé</a>
+          <a href="mailto:andrew.shin@columbia.edu">Email</a>
+          <a href="https://github.com/terreConan">GitHub</a>
+          <a href="https://www.linkedin.com/in/andshin/">LinkedIn</a>
+          <a href="https://www.instagram.com/s.hin.a/">Instagram</a>
         </p>
       </article>
     </section>
   </main>
+
+  <div class="lightbox" id="lightbox" hidden></div>
 
   <script src="tree.js"></script>
 </body>
