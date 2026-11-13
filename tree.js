@@ -1020,7 +1020,7 @@
       el.textContent = summer ? el.dataset.summer : el.dataset.winter;
     }
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = summer ? '#2b3dc3' : '#0d0a09';
+    if (meta) meta.content = summer ? '#2b3dc3' : '#2a1b12';
     if (replay) {                            // build the new scene up again
       t = 0; autoT = reduced ? AUTO_END : 0;
       try { localStorage.setItem('season', season); } catch (err) { /* private mode */ }

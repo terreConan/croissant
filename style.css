@@ -1,13 +1,13 @@
 :root {
-  --bg: #0d0a09;
+  --bg: #2a1b12;
   --text: #cfc7ba;
-  --dim: #857c70;
+  --dim: #9a8e7f;
   --strong: #f4eee3;
   --font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
   /* the typewriter face the tree is drawn in, for the small print */
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  --tip: #1b1512;
-  --veil: rgba(13, 10, 9, 0.8);
+  --tip: #3a281c;
+  --veil: rgba(30, 19, 12, 0.82);
   --band: 46vh;                  /* height of the tree band on phones */
 }
 /* summer: the same page on a deep blue */
