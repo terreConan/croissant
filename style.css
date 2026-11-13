@@ -169,10 +169,25 @@ p { margin: 0; }
   flex: none;
   width: auto;                     /* each as wide as its own shape, so the gap to the title is even */
   height: var(--h, 28px);           /* set --h on a logo to balance a wide or narrow one */
+  transform: translateY(var(--lift, 0));   /* set --lift on a logo whose weight sits low or high */
 }
 
 /* experience: each job stands apart, with a large image of the work beneath it */
 #experience .entry + .entry { margin-top: 96px; }
+#projects .card + .card { margin-top: 15px; }
+#projects .detail { margin-top: 2px; }
+#projects .shot, #projects .shots { margin-top: 14px; }
+#projects .shots .shot { margin-top: 0; }
+/* a photo with a softer, slightly faded look and darkened edges */
+.shot.soft { position: relative; }
+.shot.soft img { filter: saturate(0.82) contrast(0.92) brightness(1.04) blur(0.3px); }
+.shot.soft::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(20, 12, 6, 0.5));
+  pointer-events: none;
+}
 .shot {
   display: block;
   margin-top: 18px;
@@ -187,7 +202,8 @@ p { margin: 0; }
   object-fit: cover;
   transition: opacity 0.2s;
 }
-.shot:hover img, .shot:focus-visible img { opacity: 0.85; }
+a.shot:hover img, a.shot:focus-visible img { opacity: 0.85; }
+div.shot img { aspect-ratio: auto; }      /* an image that links nowhere, shown whole */
 video.shot { width: 100%; aspect-ratio: 16 / 9; background: #000; }
 /* projects: a row of small images */
 .shots { display: flex; gap: 12px; margin-top: 12px; }
