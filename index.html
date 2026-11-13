@@ -4,7 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Andrew Shin</title>
-  <meta name="description" content="Andrew Shin's personal site.">
+  <meta name="description" content="Andrew Shin: computer science and electrical engineering at Columbia. Experience, projects and a tree to decorate.">
+  <meta property="og:title" content="Andrew Shin">
+  <meta property="og:description" content="Experience, projects and a tree to decorate.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <meta name="theme-color" content="#2a1b12">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -19,7 +23,7 @@
       data-tree="present"        one present        (projects)
       data-tree="polaroid"       one polaroid       (hobbies)
       data-tree="star"           the star           (contact)
-    Add or remove entries and the tree follows. Text in [brackets] is placeholder.
+    Add or remove entries and the tree follows. Text in [brackets] is placeholder and should be replaced before publishing.
     Seasons: the button switches to a summer scene (a beach umbrella) built from
     the same entries: bunting flags for ornaments, beach balls for presents, the
     polaroids in a basket, the sun for the star. A data-summer attribute holds
@@ -48,38 +52,40 @@
   </button>
 
   <nav class="nav" aria-label="Sections">
-    <a href="#about">About</a>
-    <a href="#education">Education</a>
-    <a href="#experience">Experience</a>
-    <a href="#honors">Honors</a>
-    <a href="#projects">Projects</a>
-    <a href="#hobbies">Hobbies</a>
-    <a href="#contact">Contact</a>
+    <a href="#about">about</a>
+    <a href="#education">school</a>
+    <a href="#experience">work</a>
+    <a href="#honors">wins</a>
+    <a href="#projects">quests</a>
+    <a href="#hobbies">hobbies</a>
+    <a href="#contact">say hi</a>
   </nav>
 
   <main class="content">
     <section class="hero" id="top">
       <h1>Andrew Shin</h1>
-      <p>[One line on what you build and what you're looking for.]</p>
+      <p>cs & ee at columbia</p>
       <p class="hint" data-summer="Scroll to set up the beach.">Scroll to decorate the tree.</p>
     </section>
 
     <section id="about">
-      <h2>About <span class="key">(the lights)</span></h2>
-      <p>[A short paragraph about you: what you study or work on, what you're curious about, and the kind of problems you like.]</p>
+      <h2>about me <span class="key">(the lights)</span></h2>
+      <p>hey! i’m andrew, and ever since watching <em>ready player one</em> i’ve wanted to be around for what’s next.</p>
+      <p>i like the word serendipity: it’s pretty boggling (and invaluable in a way) that the tiniest changes in the past could have meant such a different future. so i enjoy going out to bakeries on a whim, running in central park, or yapping with friends at nighttime.</p>
+      <p>i’ve been nostalgic for san diego, south korea, and currently cherish the nooks &amp; crannies of new york city.</p>
     </section>
 
     <section id="education">
-      <h2>Education <span class="key" data-summer="(blue flags)">(blue ornaments)</span></h2>
+      <h2>school <span class="key" data-summer="(blue flags)">(blue ornaments)</span></h2>
       <article class="card entry" data-tree="ornament-blue" tabindex="0">
         <div class="row"><img class="logo" src="assets/logos/columbia-crown.png" alt="" style="--h: 23px; --lift: -1.5px"><h3>Columbia University</h3><span class="meta">class of 2030</span></div>
         <p>studying cs & ee</p>
-        <p class="detail">concrete jungle wet dream tomato</p>
+        <p class="detail">avid 1 train user</p>
       </article>
     </section>
 
     <section id="experience">
-      <h2>Experience <span class="key" data-summer="(red flags)">(red ornaments)</span></h2>
+      <h2>work <span class="key" data-summer="(red flags)">(red ornaments)</span></h2>
       <article class="card entry" data-tree="ornament-red" tabindex="0">
         <div class="row"><img class="logo" src="assets/logos/sep.png" alt="Stanford Encyclopedia of Philosophy"><h3>InPhO</h3><span class="meta">Apr 2025 – Present</span></div>
         <p>Research Assistant, Internet Philosophy Ontology Project</p>
@@ -107,7 +113,7 @@
     </section>
 
     <section id="honors">
-      <h2>Honors <span class="key" data-summer="(yellow flags)">(yellow ornaments)</span></h2>
+      <h2>wins <span class="key" data-summer="(yellow flags)">(yellow ornaments)</span></h2>
       <article class="card" data-tree="ornament-gold" tabindex="0">
         <h3>International Logic Olympiad</h3>
         <p class="detail">2nd and 4th worldwide; hosted by Stanford, sponsored by Jane Street</p>
@@ -123,7 +129,7 @@
     </section>
 
     <section id="projects">
-      <h2>Projects <span class="key" data-summer="(beach balls)">(presents)</span></h2>
+      <h2>side quests <span class="key" data-summer="(beach balls)">(presents)</span></h2>
       <article class="card" data-tree="present" tabindex="0">
         <div class="row"><h3>Columbia Undergraduate Trading Competition (CUTC)</h3><span class="meta">Present</span></div>
         <p class="detail">Algo Trading; server-side & preparations under development</p>
@@ -145,7 +151,7 @@
     </section>
 
     <section id="hobbies">
-      <h2>Hobbies <span class="key">(the polaroids)</span></h2>
+      <h2>off the clock <span class="key">(the polaroids)</span></h2>
       <article class="card photo" data-tree="polaroid" tabindex="0" role="button">
         <h3>Museum traipsing</h3>
         <p class="detail">what is this earth without art? just a rock.</p>
@@ -288,7 +294,7 @@
     </section>
 
     <section id="contact">
-      <h2>Contact <span class="key" data-summer="(the sun)">(the star)</span></h2>
+      <h2>say hi <span class="key" data-summer="(the sun)">(the star)</span></h2>
       <article class="card" data-tree="star" data-label="Contact" tabindex="0">
         <p class="links">
           <a href="mailto:andrew.shin@columbia.edu">Email</a>
@@ -298,6 +304,8 @@
         </p>
       </article>
     </section>
+
+    <footer class="foot">built by andrew shin, 2026</footer>
   </main>
 
   <div class="lightbox" id="lightbox" hidden></div>
