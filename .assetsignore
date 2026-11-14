@@ -1,0 +1,9 @@
+# files in the repo that are not part of the published site
+.git
+.gitignore
+.assetsignore
+.claude
+wrangler.jsonc
+serve.py
+node_modules
+.wrangler

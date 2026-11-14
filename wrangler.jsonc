@@ -1,0 +1,8 @@
+{
+  // Cloudflare Workers: serve this folder as a static site
+  "name": "croissant",
+  "compatibility_date": "2026-11-13",
+  "assets": {
+    "directory": "./"
+  }
+}
