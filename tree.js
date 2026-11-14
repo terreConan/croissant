@@ -50,7 +50,7 @@
   // vintage bulb colours
   const BULBS = [[1, 0.27, 0.2], [1, 0.68, 0.2], [0.35, 0.9, 0.42], [0.32, 0.55, 1], [1, 0.45, 0.72], [1, 0.94, 0.8]];
   const FLASH = 0.38;                  // seconds a new letter stays lit white
-  const GROW = 1.1;                    // seconds an ornament or the star takes to swell in
+  const GROW = 0.6;                    // seconds an ornament or the star takes to swell in
   // how far each kind is pulled toward the camera in the depth test
   const BIAS = [0, 0, 0.02, 0.07, 0.1, 0.12, 0.1, 0.1];
 
@@ -67,7 +67,7 @@
   const slots = new Map();
   let T_DONE = T_LIGHTS_END;
   for (const el of document.querySelectorAll('[data-tree]')) {
-    const len = el.dataset.tree === 'star' ? 1.9 : 1.3;   // long enough to finish appearing
+    const len = el.dataset.tree === 'star' ? 1.2 : 0.8;   // long enough to finish appearing
     slots.set(el, { a: T_DONE, b: T_DONE + len });
     T_DONE += len;
   }
@@ -122,7 +122,7 @@
   let lightTimes = [];
   let photoJobs = [];        // polaroid photo areas, coloured from the image once it loads
   const starEl = linked('star')[0];
-  if (starEl) T_STAR = birthOf(starEl); else T_DONE += 1.9;
+  if (starEl) T_STAR = birthOf(starEl); else T_DONE += 1.2;
 
   const bulb = (x, y, z, birth, pal) => {
     lightTimes.push(birth);
@@ -291,7 +291,7 @@
       const put = (lx, ly, lz, nx, ny, nz, col) => {
         add(px + lx * cr - lz * sr, ly, pz + lx * sr + lz * cr,
           nx * cr - nz * sr, ny, nx * sr + nz * cr, col[0], col[1], col[2],
-          t0 + 0.6 * (ly / gf.h), SOLID);
+          t0 + 0.35 * (ly / gf.h), SOLID);
       };
       const ribbon = (u, v) => (Math.abs(u - 0.5) < 0.085 || Math.abs(v - 0.5) < 0.085 ? gf.rb : gf.c);
       const dens = 9000;
@@ -394,7 +394,7 @@
         const wedge = Math.floor(((Math.atan2(d[2], d[0]) + turn + TAU * 2) % TAU) / (TAU / 6)) % 2;
         const c = Math.abs(d[1]) > 0.94 || wedge ? white : col;
         add(px + d[0] * r, r + d[1] * r, pz + d[2] * r, d[0], d[1], d[2], c[0], c[1], c[2],
-          t0 + 0.6 * ((d[1] + 1) / 2), SOLID);
+          t0 + 0.35 * ((d[1] + 1) / 2), SOLID);
       }
       curObj = 0;
     });
@@ -604,7 +604,7 @@
     autoT = Math.min(AUTO_END, autoT + dt);
     const target = Math.max(autoT, scrollT, floorT);
     if (reduced) t = target;
-    else if (target > t) t += Math.min(target - t, dt * (1 + Math.min(5, (target - t) * 0.5)));  // real time, faster the further behind
+    else if (target > t) t += Math.min(target - t, dt * (1.6 + Math.min(12, (target - t) * 1.6)));  // real time, faster the further behind
     else t += (target - t) * Math.min(1, dt * 8);                // un-build quickly
 
     if (!dragging) {
