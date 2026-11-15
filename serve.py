@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Local preview server: python3 serve.py [port]
-
-Like `python3 -m http.server`, but it answers Range requests, which browsers
-need in order to seek within the video. (GitHub Pages and other hosts do this
-already; this is only for previewing on your own machine.)
-"""
+"""Local preview server with Range support (for video seeking): python3 serve.py [port]"""
 import os
 import re
 import sys
@@ -20,7 +15,7 @@ class Handler(SimpleHTTPRequestHandler):
             return super().send_head()
         size = os.path.getsize(path)
         first, last = match.groups()
-        if first == "":                       # "-500": the last 500 bytes
+        if first == "":
             start, end = max(0, size - int(last or 0)), size - 1
         else:
             start, end = int(first), min(int(last), size - 1) if last else size - 1

@@ -14,33 +14,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!--
-    The tree is built from this page. Any element with a data-tree attribute
-    gets an object on the tree. The object appears when the element scrolls
-    into view, and clicking the object scrolls to the element:
-      data-tree="ornament-blue"  one blue ornament  (education)
-      data-tree="ornament-red"   one red ornament   (experience)
-      data-tree="ornament-gold"  one yellow ornament (honors)
-      data-tree="present"        one present        (projects)
-      data-tree="polaroid"       one polaroid       (hobbies)
-      data-tree="star"           the star           (contact)
-    Add or remove entries and the tree follows. Text in [brackets] is placeholder and should be replaced before publishing.
-    Seasons: the button switches to a summer scene (a beach umbrella) built from
-    the same entries: bunting flags for ornaments, beach balls for presents, the
-    polaroids in a basket, the sun for the star. A data-summer attribute holds
-    the wording an element shows in summer.
-    Logos: put a transparent SVG or PNG in assets/logos/ and point the entry's
-    <img class="logo"> at it. It sits in front of the entry's title, bare on the
-    dark page. Links that leave the page open in a new tab.
-    Showcases: each job has a large image (<a class="shot">) or a <video class="shot">.
-    Put the file in assets/work/, point at it, and set the link's href to the
-    project. Projects can carry a row of small ones (<div class="shots">).
-    Polaroids: put photos in assets/photos/ and list them inside the entry as
-    <ul class="photos" hidden><li data-src="..." data-w="..." data-h="..."></li></ul>
-    (data-w and data-h are the image's pixel size), or in a data-photo attribute
-    separated by " | ". The polaroid on the tree is drawn from the first one,
-    and clicking it (or the entry) opens them on wheels you can scroll.
-  -->
+  <!-- elements with data-tree get an object on the tree; data-summer holds the summer wording -->
   <div class="stage" aria-hidden="true">
     <canvas id="scene"></canvas>
     <canvas id="glow"></canvas>
