@@ -1,6 +1,7 @@
 // ASCII tree: a 3D point cloud projected onto a grid of character cells.
 (() => {
   'use strict';
+  document.documentElement.classList.add('js');
 
   const TAU = Math.PI * 2;
   const canvas = document.getElementById('scene');
@@ -86,12 +87,16 @@
   const treeH = () => (rnd() < 0.78 ? 1 - Math.sqrt(rnd()) : rnd());
 
   let objects = [];
-  const TYPE_NAME = { 'ornament-blue': 'education', 'ornament-red': 'experience', 'ornament-gold': 'honor', present: 'project', polaroid: 'photo', star: 'contact' };
+  // tooltips use the section's own heading word, so the tree and the column share one vocabulary
+  const sectionName = (el) => {
+    const h2 = el.closest('section') && el.closest('section').querySelector('h2');
+    return h2 ? h2.firstChild.textContent.trim() : '';
+  };
   const link = (el, type, color, pos, azimuth, birth) => {
     const heading = el.querySelector('h3, h2');
     const label = el.dataset.label || (heading ? heading.textContent.replace(/\s+/g, ' ').trim() : '');
     const accent = `rgb(${color.map((c) => Math.round(Math.min(1, c * 1.1) * 255)).join(',')})`;
-    objects.push({ el, type, label, accent, pos, azimuth, birth, soft: type !== 'present', fixed: false });
+    objects.push({ el, type, label, section: sectionName(el), accent, pos, azimuth, birth, soft: type !== 'present', fixed: false });
     curObj = objects.length;
   };
   const photosOf = (el) => [
@@ -462,6 +467,7 @@
 
   let W = 0, H = 0, dpr = 1, cellW = 6, cellH = 10, cols = 0, rows = 0, focal = 1;
   let wide = true;
+  const heroEl = document.getElementById('top');
   let originX = 0, originY = 0;
   let zbuf, ibuf, groundR, groundHash;
 
@@ -560,6 +566,7 @@
       if (p > 0) s = Math.max(s, slot.a + p * (slot.b - slot.a));
     }
     const doc = document.documentElement;
+    if (heroEl) doc.classList.toggle('compact', !wide && heroEl.getBoundingClientRect().bottom < vh * 0.5);
     if (vh + window.scrollY >= doc.scrollHeight - 2) s = T_DONE;
     scrollT = s;
   }
@@ -762,7 +769,7 @@
     canvas.classList.toggle('pointing', !!obj);
     tip.classList.toggle('on', !!obj);
     if (!obj) return;
-    tip.textContent = obj.label ? `${TYPE_NAME[obj.type]} · ${obj.label}` : TYPE_NAME[obj.type];
+    tip.textContent = obj.label ? `${obj.section} · ${obj.label}` : obj.section;
     tip.style.setProperty('--accent', obj.accent);
     tip.style.left = `${Math.min(x + 14, W - tip.offsetWidth - 8)}px`;
     tip.style.top = `${Math.max(8, y - 34)}px`;
@@ -773,6 +780,9 @@
   let tiles = [], wheels = [];
   let wheelPos = 0, wheelTo = 0, wheelRaf = 0, snapTimer = 0, wheelEase = 0.3;
   let grabbed = false, grabAt = 0, grabMoved = false;
+  let hintEl = null, opener = null, shownAt = -1;
+  const coarse = window.matchMedia('(pointer: coarse)');
+  const behind = () => [document.querySelector('main'), document.querySelector('.stage'), document.getElementById('season')].filter(Boolean);
 
   function layoutWheels() {
     const vw = window.innerWidth, vh = window.innerHeight, narrow = vw < 800;
@@ -825,6 +835,17 @@
         tile.img.classList.toggle('hot', f > 0.5);
       }
     }
+    showPosition();
+  }
+  function showPosition() {
+    if (!hintEl || !wheels.length) return;
+    const n = wheels[0].items.length, k = ((Math.round(wheelPos) % n) + n) % n;
+    if (k === shownAt) return;
+    shownAt = k;
+    const total = tiles.length;
+    // desktop splits the album across two wheels: tiles 2k and 2k+1 face each other
+    const at = wheels.length === 2 ? `${2 * k + 1}–${Math.min(2 * k + 2, total)}` : `${k + 1}`;
+    hintEl.textContent = `${at} / ${total} · ${coarse.matches ? 'swipe · tap to close' : 'scroll · esc to close'}`;
   }
 
   function turn() {
@@ -850,19 +871,24 @@
     const photos = photosOf(obj.el);
     if (!box || !photos.length) return;
     box.textContent = '';
-    tiles = photos.map((photo) => {
+    tiles = [];
+    photos.forEach((photo) => {
       const img = document.createElement('img');
       img.src = photo.src;
-      img.alt = obj.label;
+      img.alt = `${obj.label}, photo ${tiles.length + 1} of ${photos.length}`;
       img.draggable = false;
       box.appendChild(img);
-      return { img, ar: photo.w && photo.h ? photo.w / photo.h : 1 };
+      tiles.push({ img, ar: photo.w && photo.h ? photo.w / photo.h : 1 });
     });
-    const hint = document.createElement('p');
-    hint.className = 'hint wheel-hint';
-    hint.textContent = 'scroll';
-    box.appendChild(hint);
+    hintEl = document.createElement('p');
+    hintEl.className = 'hint wheel-hint';
+    box.appendChild(hintEl);
+    shownAt = -1;
+    box.setAttribute('aria-label', obj.label);
+    opener = document.activeElement;
+    for (const el of behind()) el.inert = true;
     box.hidden = false;
+    box.focus({ preventScroll: true });
     layoutWheels();
     wheelPos = reduced ? 0 : -1.5;
     drawWheels();
@@ -873,6 +899,9 @@
   function closePhoto() {
     if (!box || box.hidden) return;
     box.classList.remove('open');
+    for (const el of behind()) el.inert = false;
+    if (opener && opener.focus) opener.focus({ preventScroll: true });
+    opener = null;
     setTimeout(() => { if (!box.classList.contains('open')) box.hidden = true; }, reduced ? 0 : 450);
   }
   if (box) {
@@ -950,8 +979,8 @@
     const off = () => { if (focusObj && focusObj.el === el) focusObj = null; };
     el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') on(); });
     el.addEventListener('pointerleave', off);
-    el.addEventListener('focus', on);
-    el.addEventListener('blur', off);
+    el.addEventListener('focusin', on);
+    el.addEventListener('focusout', off);
     if (el.dataset.tree === 'polaroid') {
       const show = () => { const obj = mine(); if (obj) openPhoto(obj); };
       el.addEventListener('click', show);
@@ -974,6 +1003,8 @@
       if (el.dataset.winter === undefined) el.dataset.winter = el.textContent;
       el.textContent = summer ? el.dataset.summer : el.dataset.winter;
     }
+    const state = document.getElementById('season-state');
+    if (state) state.textContent = `: switch to ${summer ? 'winter' : 'summer'}`;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = summer ? '#2b3dc3' : '#2a1b12';
     if (replay) {
@@ -1002,6 +1033,7 @@
   });
   window.addEventListener('scroll', readScroll, { passive: true });
   window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(() => { if (canvas.clientHeight !== H || canvas.clientWidth !== W) resize(); }).observe(canvas);
   window.addEventListener('resize', () => { if (box && !box.hidden) { layoutWheels(); drawWheels(); } });
 
   resize();
