@@ -1003,8 +1003,6 @@
       if (el.dataset.winter === undefined) el.dataset.winter = el.textContent;
       el.textContent = summer ? el.dataset.summer : el.dataset.winter;
     }
-    const state = document.getElementById('season-state');
-    if (state) state.textContent = `: switch to ${summer ? 'winter' : 'summer'}`;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = summer ? '#2b3dc3' : '#2a1b12';
     if (replay) {

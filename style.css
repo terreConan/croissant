@@ -37,14 +37,6 @@ html, body {
 
 ::selection { background: var(--strong); color: var(--bg); }
 :focus-visible { outline: 1px solid var(--strong); outline-offset: 4px; }
-.sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
 
 /* without the script there is no tree to decorate */
 html:not(.js) .stage, html:not(.js) .season, html:not(.js) .hint { display: none; }
