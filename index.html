@@ -26,21 +26,20 @@
     <span data-summer="A little warmth?">A little breeze?</span>
   </button>
 
-  <nav class="nav" aria-label="Sections">
-    <a href="#about">about</a>
-    <a href="#education">school</a>
-    <a href="#experience">work</a>
-    <a href="#honors">wins</a>
-    <a href="#projects">quests</a>
-    <a href="#hobbies">hobbies</a>
-    <a href="#contact">say hi</a>
-  </nav>
-
   <main class="content">
     <section class="hero" id="top">
       <h1>Andrew Shin</h1>
       <p>cs & ee at columbia</p>
-      <p class="hint" data-summer="Scroll to set up the beach.">Scroll to decorate the tree.</p>
+      <p class="hint" data-summer="scroll to set up the beach.">scroll to decorate the tree.</p>
+      <nav class="nav" aria-label="Sections">
+        <a href="#about">about me</a>
+        <a href="#education">school</a>
+        <a href="#experience">work</a>
+        <a href="#honors">wins</a>
+        <a href="#projects">side quests</a>
+        <a href="#hobbies">off the clock</a>
+        <a href="#contact">say hi</a>
+      </nav>
     </section>
 
     <section id="about">
@@ -53,7 +52,7 @@
 
     <section id="education">
       <h2>school <span class="key" data-summer="(blue flags)">(blue ornaments)</span></h2>
-      <article class="card entry" data-tree="ornament-blue" tabindex="0">
+      <article class="card entry" data-tree="ornament-blue">
         <div class="row"><img class="logo" src="assets/logos/columbia-crown.png" alt="" style="--h: 23px; --lift: -1.5px"><h3>Columbia University</h3><span class="meta">class of 2030</span></div>
         <p class="detail">1 train passenger</p>
       </article>
@@ -61,25 +60,25 @@
 
     <section id="experience">
       <h2>work <span class="key" data-summer="(red flags)">(red ornaments)</span></h2>
-      <article class="card entry" data-tree="ornament-red" tabindex="0">
+      <article class="card entry" data-tree="ornament-red">
         <div class="row"><img class="logo" src="assets/logos/sep.png" alt="Stanford Encyclopedia of Philosophy"><h3>InPhO</h3></div>
         <p>Research Assistant</p>
         <p class="detail">Restored in the Stanford Encyclopedia of Philosophy for 300,000 weekly readers; incoming P&D Journal for a study on AI substitution for human judgment</p>
-        <a class="shot" href="https://www.inphoproject.org/"><img src="assets/work/inpho.jpg" alt="The InPhO Project home page" width="1600" height="1000" loading="lazy"></a>
+        <a class="shot muted" href="https://www.inphoproject.org/"><img src="assets/work/inpho.jpg" alt="The InPhO Project home page" width="1600" height="1000" loading="lazy"></a>
       </article>
-      <article class="card entry" data-tree="ornament-red" tabindex="0">
+      <article class="card entry" data-tree="ornament-red">
         <div class="row"><img class="logo" src="assets/logos/brown.png" alt="" style="--h: 30px"><h3>Brown University</h3></div>
         <p>Student Researcher</p>
         <p class="detail">1st place in Computer Science and Systems Software at the 71st GSDSEF</p>
         <a class="shot" href="assets/work/harmonization.pdf"><img src="assets/work/harmonization.jpg" alt="Research poster: Harmonizing Human Attention and Deep Neural Networks" width="1600" height="1000" loading="lazy"></a>
       </article>
-      <article class="card entry" data-tree="ornament-red" tabindex="0">
+      <article class="card entry" data-tree="ornament-red">
         <div class="row"><img class="logo" src="assets/logos/columbia-space-initiative.png" alt=""><h3>Columbia Space Initiative</h3></div>
         <p>Navigation Team</p>
         <p class="detail">AR navigation for astronauts on simulated lunar retrieval missions; routes planned around terrain and oxygen supply, built in Unity with headset hardware</p>
         <div class="shot"><img src="assets/work/columbia-space-initiative.jpg" alt="Astronaut heads-up display mockup: suit vitals, a traverse map and a gesture menu over the lunar surface" width="1195" height="771" loading="lazy"></div>
       </article>
-      <article class="card entry" data-tree="ornament-red" tabindex="0">
+      <article class="card entry" data-tree="ornament-red">
         <div class="row"><img class="logo" src="assets/logos/camp-lapulapu.png" alt="Camp Lapulapu Elementary School"><h3>Project GPT Plus</h3></div>
         <p>AI Team Lead</p>
         <p class="detail">Engineered storybook AIs for 2000 students at Camp Lapu-lapu Elementary School; w/ director of Northwestern's MS in Data Science</p>
@@ -88,16 +87,16 @@
     </section>
 
     <section id="honors">
-      <h2>wins <span class="key" data-summer="(yellow flags)">(yellow ornaments)</span></h2>
-      <article class="card" data-tree="ornament-gold" tabindex="0">
+      <h2>wins <span class="key" data-summer="(yellow flags)">(gold ornaments)</span></h2>
+      <article class="card" data-tree="ornament-gold">
         <h3>International Logic Olympiad</h3>
         <p class="detail">2nd and 4th worldwide; hosted by Stanford, sponsored by Jane Street</p>
       </article>
-      <article class="card" data-tree="ornament-gold" tabindex="0">
+      <article class="card" data-tree="ornament-gold">
         <h3>American Computer Science League</h3>
         <p class="detail">Gold Medalist using C++</p>
       </article>
-      <article class="card" data-tree="ornament-gold" tabindex="0">
+      <article class="card" data-tree="ornament-gold">
         <h3>Conrad Innovator</h3>
         <p class="detail">YOLOv8 glasses for hazards</p>
       </article>
@@ -105,20 +104,20 @@
 
     <section id="projects">
       <h2>side quests <span class="key" data-summer="(beach balls)">(presents)</span></h2>
-      <article class="card" data-tree="present" tabindex="0">
+      <article class="card" data-tree="present">
         <div class="row"><h3>Columbia Undergraduate Trading Competition</h3></div>
         <p class="detail">Algo Trading; server-side & logistics under development</p>
         <div class="shot banner soft"><img src="assets/work/cutc.jpg" alt="Competitors at the trading competition, laptops showing code and live market charts" width="1600" height="606" loading="lazy"></div>
       </article>
-      <article class="card" data-tree="present" tabindex="0">
+      <article class="card" data-tree="present">
         <div class="row"><h3>Double Pendulums</h3></div>
         <p class="detail">Visualizing the butterfly effect by mapping double pendulums in Next.js; designed after Dieter Rams' principles</p>
-        <div class="shots">
-          <a class="shot" href="https://doublependulums.vercel.app"><img src="assets/work/double-pendulums-front.jpg" alt="The Double Pendulums front page: a white double pendulum on black" width="800" height="514" loading="lazy"></a>
-          <a class="shot" href="https://doublependulums.vercel.app"><img src="assets/work/double-pendulums.jpg" alt="The chaos map of a double pendulum" width="800" height="514" loading="lazy"></a>
-        </div>
+        <a class="shots" href="https://doublependulums.vercel.app">
+          <span class="shot"><img src="assets/work/double-pendulums-front.jpg" alt="The Double Pendulums front page: a white double pendulum on black" width="800" height="514" loading="lazy"></span>
+          <span class="shot"><img src="assets/work/double-pendulums.jpg" alt="The chaos map of a double pendulum" width="800" height="514" loading="lazy"></span>
+        </a>
       </article>
-      <article class="card" data-tree="present" tabindex="0">
+      <article class="card" data-tree="present">
         <div class="row"><h3>Philodom</h3></div>
         <p class="detail">RAG for conversing with philosophers; accepted to the <a href="https://philosophydata.com/">Philosophy Data Project</a></p>
         <a class="shot banner" href="https://philosophydata.com/"><img src="assets/work/philodom-banner.jpg" alt="The Philosophy Data Project banner" width="1505" height="613" loading="lazy"></a>
@@ -270,7 +269,7 @@
 
     <section id="contact">
       <h2>say hi <span class="key" data-summer="(the sun)">(the star)</span></h2>
-      <article class="card" data-tree="star" data-label="Contact" tabindex="0">
+      <article class="card" data-tree="star">
         <p class="links">
           <a href="mailto:andrew.shin@columbia.edu">Email</a>
           <a href="https://github.com/terreConan">GitHub</a>
@@ -283,7 +282,7 @@
     <footer class="foot">built by andrew shin, 2026</footer>
   </main>
 
-  <div class="lightbox" id="lightbox" hidden></div>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" tabindex="-1" hidden></div>
 
   <script src="tree.js"></script>
 </body>

@@ -7,3 +7,7 @@ wrangler.jsonc
 serve.py
 node_modules
 .wrangler
+PRODUCT.md
+DESIGN.md
+.impeccable
+.playwright-mcp

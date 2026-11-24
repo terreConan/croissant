@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T06:41:36+00:00",
+  "title": "Design System: Andrew Shin",
+  "extensions": {
+    "colorMeta": {
+      "espresso": {
+        "role": "primary",
+        "displayName": "Espresso",
+        "canonical": "oklch(23.9% 0.029 52)",
+        "tonalRamp": [
+          "oklch(15% 0.011 52)",
+          "oklch(26% 0.016 52)",
+          "oklch(38% 0.021 52)",
+          "oklch(49% 0.026 52)",
+          "oklch(61% 0.026 52)",
+          "oklch(72% 0.021 52)",
+          "oklch(84% 0.016 52)",
+          "oklch(95% 0.011 52)"
+        ]
+      },
+      "beach-towel-blue": {
+        "role": "primary",
+        "displayName": "Beach Towel Blue",
+        "canonical": "oklch(44.4% 0.207 269)",
+        "tonalRamp": [
+          "oklch(15% 0.079 269)",
+          "oklch(26% 0.115 269)",
+          "oklch(38% 0.152 269)",
+          "oklch(49% 0.188 269)",
+          "oklch(61% 0.188 269)",
+          "oklch(72% 0.152 269)",
+          "oklch(84% 0.115 269)",
+          "oklch(95% 0.079 269)"
+        ]
+      },
+      "parchment": {
+        "role": "neutral",
+        "displayName": "Parchment",
+        "canonical": "oklch(83.3% 0.020 80)",
+        "tonalRamp": [
+          "oklch(15% 0.008 80)",
+          "oklch(26% 0.011 80)",
+          "oklch(38% 0.015 80)",
+          "oklch(49% 0.018 80)",
+          "oklch(61% 0.018 80)",
+          "oklch(72% 0.015 80)",
+          "oklch(84% 0.011 80)",
+          "oklch(95% 0.008 80)"
+        ]
+      },
+      "driftwood": {
+        "role": "neutral",
+        "displayName": "Driftwood",
+        "canonical": "oklch(65.3% 0.026 73)",
+        "tonalRamp": [
+          "oklch(15% 0.010 73)",
+          "oklch(26% 0.015 73)",
+          "oklch(38% 0.019 73)",
+          "oklch(49% 0.024 73)",
+          "oklch(61% 0.024 73)",
+          "oklch(72% 0.019 73)",
+          "oklch(84% 0.015 73)",
+          "oklch(95% 0.010 73)"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "oklch(95.1% 0.016 83)",
+        "tonalRamp": [
+          "oklch(15% 0.006 83)",
+          "oklch(26% 0.009 83)",
+          "oklch(38% 0.012 83)",
+          "oklch(49% 0.015 83)",
+          "oklch(61% 0.015 83)",
+          "oklch(72% 0.012 83)",
+          "oklch(84% 0.009 83)",
+          "oklch(95% 0.006 83)"
+        ]
+      },
+      "ember-tip": {
+        "role": "neutral",
+        "displayName": "Ember Tip",
+        "canonical": "oklch(29.5% 0.034 55)",
+        "tonalRamp": [
+          "oklch(15% 0.013 55)",
+          "oklch(26% 0.019 55)",
+          "oklch(38% 0.025 55)",
+          "oklch(49% 0.031 55)",
+          "oklch(61% 0.031 55)",
+          "oklch(72% 0.025 55)",
+          "oklch(84% 0.019 55)",
+          "oklch(95% 0.013 55)"
+        ]
+      },
+      "summer-text": {
+        "role": "neutral",
+        "displayName": "Summer Text",
+        "canonical": "oklch(93.2% 0.033 278)",
+        "tonalRamp": [
+          "oklch(15% 0.013 278)",
+          "oklch(26% 0.018 278)",
+          "oklch(38% 0.024 278)",
+          "oklch(49% 0.030 278)",
+          "oklch(61% 0.030 278)",
+          "oklch(72% 0.024 278)",
+          "oklch(84% 0.018 278)",
+          "oklch(95% 0.013 278)"
+        ]
+      },
+      "summer-dim": {
+        "role": "neutral",
+        "displayName": "Summer Dim",
+        "canonical": "oklch(81.3% 0.073 277)",
+        "tonalRamp": [
+          "oklch(15% 0.034 277)",
+          "oklch(26% 0.050 277)",
+          "oklch(38% 0.065 277)",
+          "oklch(49% 0.081 277)",
+          "oklch(61% 0.081 277)",
+          "oklch(72% 0.065 277)",
+          "oklch(84% 0.050 277)",
+          "oklch(95% 0.034 277)"
+        ]
+      },
+      "summer-strong": {
+        "role": "neutral",
+        "displayName": "Summer Strong",
+        "canonical": "oklch(100.0% 0.000 90)",
+        "tonalRamp": [
+          "oklch(15% 0.000 90)",
+          "oklch(26% 0.000 90)",
+          "oklch(38% 0.000 90)",
+          "oklch(49% 0.000 90)",
+          "oklch(61% 0.000 90)",
+          "oklch(72% 0.000 90)",
+          "oklch(84% 0.000 90)",
+          "oklch(95% 0.000 90)"
+        ]
+      },
+      "summer-tip": {
+        "role": "neutral",
+        "displayName": "Summer Tip",
+        "canonical": "oklch(36.6% 0.174 269)",
+        "tonalRamp": [
+          "oklch(15% 0.066 269)",
+          "oklch(26% 0.097 269)",
+          "oklch(38% 0.128 269)",
+          "oklch(49% 0.158 269)",
+          "oklch(61% 0.158 269)",
+          "oklch(72% 0.128 269)",
+          "oklch(84% 0.097 269)",
+          "oklch(95% 0.066 269)"
+        ]
+      },
+      "ornament-blue": {
+        "role": "tertiary",
+        "displayName": "Ornament Blue",
+        "canonical": "oklch(67.1% 0.174 261)",
+        "tonalRamp": [
+          "oklch(15% 0.066 261)",
+          "oklch(26% 0.097 261)",
+          "oklch(38% 0.128 261)",
+          "oklch(49% 0.159 261)",
+          "oklch(61% 0.159 261)",
+          "oklch(72% 0.128 261)",
+          "oklch(84% 0.097 261)",
+          "oklch(95% 0.066 261)"
+        ]
+      },
+      "ornament-red": {
+        "role": "tertiary",
+        "displayName": "Ornament Red",
+        "canonical": "oklch(61.0% 0.238 27)",
+        "tonalRamp": [
+          "oklch(15% 0.091 27)",
+          "oklch(26% 0.133 27)",
+          "oklch(38% 0.175 27)",
+          "oklch(49% 0.217 27)",
+          "oklch(61% 0.217 27)",
+          "oklch(72% 0.175 27)",
+          "oklch(84% 0.133 27)",
+          "oklch(95% 0.091 27)"
+        ]
+      },
+      "ornament-gold": {
+        "role": "tertiary",
+        "displayName": "Ornament Gold",
+        "canonical": "oklch(84.2% 0.161 82)",
+        "tonalRamp": [
+          "oklch(15% 0.061 82)",
+          "oklch(26% 0.090 82)",
+          "oklch(38% 0.118 82)",
+          "oklch(49% 0.146 82)",
+          "oklch(61% 0.146 82)",
+          "oklch(72% 0.118 82)",
+          "oklch(84% 0.090 82)",
+          "oklch(95% 0.061 82)"
+        ]
+      },
+      "star-gold": {
+        "role": "tertiary",
+        "displayName": "Star Gold",
+        "canonical": "oklch(92.0% 0.162 99)",
+        "tonalRamp": [
+          "oklch(15% 0.062 99)",
+          "oklch(26% 0.090 99)",
+          "oklch(38% 0.119 99)",
+          "oklch(49% 0.148 99)",
+          "oklch(61% 0.148 99)",
+          "oklch(72% 0.119 99)",
+          "oklch(84% 0.090 99)",
+          "oklch(95% 0.062 99)"
+        ]
+      },
+      "flag-blue": {
+        "role": "tertiary",
+        "displayName": "Flag Blue",
+        "canonical": "oklch(86.4% 0.092 224)",
+        "tonalRamp": [
+          "oklch(15% 0.035 224)",
+          "oklch(26% 0.051 224)",
+          "oklch(38% 0.068 224)",
+          "oklch(49% 0.084 224)",
+          "oklch(61% 0.084 224)",
+          "oklch(72% 0.068 224)",
+          "oklch(84% 0.051 224)",
+          "oklch(95% 0.035 224)"
+        ]
+      },
+      "flag-red": {
+        "role": "tertiary",
+        "displayName": "Flag Red",
+        "canonical": "oklch(66.5% 0.222 28)",
+        "tonalRamp": [
+          "oklch(15% 0.085 28)",
+          "oklch(26% 0.124 28)",
+          "oklch(38% 0.163 28)",
+          "oklch(49% 0.203 28)",
+          "oklch(61% 0.203 28)",
+          "oklch(72% 0.163 28)",
+          "oklch(84% 0.124 28)",
+          "oklch(95% 0.085 28)"
+        ]
+      },
+      "flag-yellow": {
+        "role": "tertiary",
+        "displayName": "Flag Yellow",
+        "canonical": "oklch(90.7% 0.166 97)",
+        "tonalRamp": [
+          "oklch(15% 0.064 97)",
+          "oklch(26% 0.093 97)",
+          "oklch(38% 0.122 97)",
+          "oklch(49% 0.152 97)",
+          "oklch(61% 0.152 97)",
+          "oklch(72% 0.122 97)",
+          "oklch(84% 0.093 97)",
+          "oklch(95% 0.064 97)"
+        ]
+      },
+      "espresso-veil": {
+        "role": "neutral",
+        "displayName": "Espresso Veil",
+        "canonical": "rgba(30, 19, 12, 0.82)"
+      },
+      "summer-veil": {
+        "role": "neutral",
+        "displayName": "Summer Veil",
+        "canonical": "rgba(22, 32, 120, 0.8)"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name in the hero, and nowhere else."
+      },
+      "headline": {
+        "displayName": "Section Heading",
+        "purpose": "Section headings in Cream at 600, with a Driftwood ornament key."
+      },
+      "title": {
+        "displayName": "Card Title",
+        "purpose": "Entry titles; light up in the ornament accent."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Role lines, about copy and details."
+      },
+      "label": {
+        "displayName": "Mono Label",
+        "purpose": "Nav, meta, hints and footer; lowercase."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lightbox-hot",
+        "value": "0 24px 70px rgba(0, 0, 0, 0.6)",
+        "purpose": "Only on the photo you've opened in the lightbox."
+      },
+      {
+        "name": "tree-glow",
+        "value": "filter: blur(9px) saturate(1.3); opacity: 0.45; mix-blend-mode: screen",
+        "purpose": "Glow canvas behind the tree (opacity 0.28 in summer)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "title-light",
+        "value": "color 0.3s",
+        "purpose": "A card title lighting up in its accent."
+      },
+      {
+        "name": "season-flip",
+        "value": "transform 0.4s ease",
+        "purpose": "Season dot rotation."
+      },
+      {
+        "name": "lightbox-fade",
+        "value": "opacity 0.5s ease",
+        "purpose": "Lightbox open and close."
+      },
+      {
+        "name": "shot-dim",
+        "value": "opacity 0.2s",
+        "purpose": "Linked media hover."
+      },
+      {
+        "name": "band-compact",
+        "value": "height 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Phone tree band easing from 46svh to 28svh past the hero."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "max-width: 899px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Season Toggle",
+      "kind": "button",
+      "refersTo": "season-toggle",
+      "description": "Half-filled ring plus a casual question; switches winter and summer.",
+      "html": "<button class=\"ds-season\" type=\"button\"><span class=\"ds-season-dot\"></span><span>A little breeze?</span></button>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-season{display:flex;align-items:center;gap:12px;padding:6px 0;border:0;background:none;color:var(--text);font:16px var(--font);cursor:pointer;}.ds-season:hover,.ds-season:focus-visible{color:var(--strong);}.ds-season-dot{width:22px;height:22px;border:2px solid currentColor;border-radius:50%;background:linear-gradient(90deg,currentColor 50%,transparent 50%);transition:transform .4s ease;}.ds-season:active .ds-season-dot{transform:rotate(180deg);}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Lowercase 12px mono section links, dim at rest.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\">about me</a><a href=\"#\">school</a><a href=\"#\">work</a><a href=\"#\">wins</a><a href=\"#\">side quests</a><a href=\"#\">say hi</a></nav>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-nav{display:flex;gap:18px;font:12px/1.6 var(--mono);}.ds-nav a{color:var(--dim);text-decoration:none;}.ds-nav a:hover,.ds-nav a:focus-visible{color:var(--strong);}.ds-nav a:focus-visible{outline:1px solid var(--strong);outline-offset:4px;}"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Lowercase heading at body size, Cream 600, plus a dim key naming its ornament.",
+      "html": "<h2 class=\"ds-h2\">work <span class=\"ds-key\">(red ornaments)</span></h2>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-h2{margin:0;font:600 15px/1.6 var(--font);color:var(--strong);}.ds-key{color:var(--dim);font-weight:400;}"
+    },
+    {
+      "name": "Entry Card",
+      "kind": "card",
+      "refersTo": "card-title",
+      "description": "Containerless card; title lights in the ornament accent on focus.",
+      "html": "<article class=\"ds-card\" tabindex=\"0\" style=\"--accent:#5492ff\"><div class=\"ds-row\"><h3>Columbia University</h3><span class=\"ds-meta\">class of 2030</span></div><p class=\"ds-detail\">1 train passenger</p></article>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-card{display:flex;flex-direction:column;outline:none;font:15px/1.6 var(--font);color:var(--text);max-width:480px;}.ds-card p{margin:0;}.ds-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}.ds-card h3{margin:0;flex:1;font-size:1em;font-weight:600;color:var(--strong);transition:color .3s;}.ds-card:hover h3,.ds-card:focus-within h3{color:var(--accent);}.ds-card:focus-visible{outline:1px solid var(--strong);outline-offset:4px;}.ds-meta{font:12px var(--mono);color:var(--dim);}.ds-detail{color:var(--dim);}"
+    },
+    {
+      "name": "Shot",
+      "kind": "custom",
+      "refersTo": "shot",
+      "description": "Full-width media clipped to 6px; linked shots dim on hover.",
+      "html": "<a class=\"ds-shot\" href=\"#\"><span class=\"ds-shot-img\"></span></a>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-shot{display:block;width:320px;border-radius:6px;overflow:hidden;}.ds-shot-img{display:block;aspect-ratio:16/10;background:linear-gradient(135deg,#4a3324,#1a100a);transition:opacity .2s;}.ds-shot:hover .ds-shot-img,.ds-shot:focus-visible .ds-shot-img{opacity:.85;}"
+    },
+    {
+      "name": "Contact Links",
+      "kind": "custom",
+      "refersTo": "contact-link",
+      "description": "Strong text with a dim underline that brightens on hover.",
+      "html": "<p class=\"ds-links\"><a href=\"#\">Email</a><a href=\"#\">GitHub</a><a href=\"#\">LinkedIn</a><a href=\"#\">Instagram</a></p>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-links{display:flex;flex-wrap:wrap;gap:2px 16px;margin:0;font:15px/1.6 var(--font);}.ds-links a{color:var(--strong);text-underline-offset:3px;text-decoration-color:var(--dim);}.ds-links a:hover,.ds-links a:focus-visible{text-decoration-color:currentColor;}"
+    },
+    {
+      "name": "Tree Tooltip",
+      "kind": "custom",
+      "refersTo": "tooltip",
+      "description": "Square-cornered label that follows the hovered ornament.",
+      "html": "<div class=\"ds-tip\">Columbia Space Initiative</div>",
+      "css": ":host{--bg:#2a1b12;--text:#cfc7ba;--dim:#9a8e7f;--strong:#f4eee3;--tip:#3a281c;--font:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;--mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;}.ds-tip{display:inline-block;padding:3px 8px;font:13px var(--font);color:var(--strong);background:var(--tip);white-space:nowrap;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Terminal Hearth",
+    "overview": "The warmth here is made of code. The left side of the screen is a living ASCII tree: a 3D point cloud drawn as monospace characters, with a soft glow behind it. The right side is a narrow column of text. Everything is small and set in the system typeface. The column sits on the same espresso background as the tree, with no boxes around it, so the text reads like notes left beside a fire. Switch the season and the room turns into a bright beach afternoon. The whole page changes over, but the column stays put and keeps the same rules.\n\nThe text side is precise and understated: one typeface family, one size (15px), hierarchy from brightness rather than size, small monospace labels, and exact spacing with nothing for decoration. All the expression belongs to the tree. The column's job is to be quietly legible while the tree is the thing you look at.",
+    "keyCharacteristics": [
+      "The page is two layers. A fixed full-viewport canvas (the tree) sits behind a text column that scrolls on the right.",
+      "Hierarchy is luminance. Strong, text and dim levels at one size, with no type scale beyond the 26px name.",
+      "One mono voice for labels. The nav, hints, meta and footer are all 12px monospace.",
+      "Completely flat. There are no boxes, borders or shadows on the text side.",
+      "Two complete themes. Winter (espresso) and summer (beach towel blue) swap every neutral.",
+      "Colour is borrowed. It appears in the text only when a card's ornament lights up on the tree."
+    ],
+    "rules": [
+      {
+        "name": "The Tree Owns Colour Rule",
+        "body": "The text column is neutral. Saturated colour appears there only when a card's matching ornament lights up: the card title takes `--accent` when the card is lit from the tree, hovered with a mouse, or holds focus. Don't add accent colours to links, keys, buttons or backgrounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The Whole-Season Rule",
+        "body": "Every neutral has a summer counterpart. A new colour is incomplete until it's defined under both `:root` and `:root[data-theme=\"summer\"]`.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Size Rule",
+        "body": "Everything except the name is 15px. Rank comes from weight (600 vs 400) and luminance (strong, text, dim), never from a bigger font.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lowercase Mono Rule",
+        "body": "Labels are 12px monospace and lowercase. They are never uppercase or letter-spaced.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Column Rule",
+        "body": "Nothing on the text side gets a box, border, background panel or shadow. If something needs separating, use spacing or luminance.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep every new token paired across winter and summer.",
+      "Do rank text by luminance (Cream, Parchment, Driftwood) at 15px. Only the name is larger (26px).",
+      "Do use 12px lowercase monospace for any label, meta or hint.",
+      "Do give every new section a `data-tree` object and a `.key` naming it, e.g. \"(presents)\". Give it a summer wording too.",
+      "Do keep the Cream focus outline on everything focusable, and remove motion under `prefers-reduced-motion`.",
+      "Do name each section once and reuse that word in the nav, heading and tooltip."
+    ],
+    "donts": [
+      "Don't put boxes, borders, panels or shadows on the text column.",
+      "Don't use ornament colours anywhere in the text except a lit, hovered or focused card title.",
+      "Don't make an element a tab stop unless it does something.",
+      "Don't add a heading size between 15px and 26px, or uppercase or letter-spaced labels.",
+      "Don't let content cover or block the tree on desktop. The column stays right of the gutter and ignores pointer events between items."
+    ]
+  }
+}
